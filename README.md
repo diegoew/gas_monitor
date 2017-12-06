@@ -13,5 +13,5 @@ Orginal Version: follows the tutorial for most part - fixed curve calculation
 - mq2.py
 - mcp3008.py
 
-3rd Version: no finished... working on cleaning code and adding correct calculations.
+3rd Version: not finished... working on cleaning code and adding correct calculations.
 - mq3.py
