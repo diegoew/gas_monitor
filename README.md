@@ -2,14 +2,14 @@
 Gas Monitor
 
 Orginal Version: follows the tutorial for most part - fixed curve calculation
-- example.py
+- example.py  <-- run this!
 - mq.py
 - mcp3008
 
 - gas.py --> same as example.py but showing all sensitivities
 
 2nd Version: 3 sensors.... I just duplicated the calcualtions. The values are nonsense, but it works to see if all sensors are reading
-- gas-2.py
+- gas-2.py  <-- run this!
 - mq2.py
 - mcp3008.py
 
