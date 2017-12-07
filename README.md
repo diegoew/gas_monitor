@@ -1,7 +1,7 @@
 # gas_monitor
 Gas Monitor
 
-Orginal Version: follows the tutorial for most part - fixed curve calculation
+Orginal Version: follows the tutorial for most part - adjusted curve calculation
 - example.py  <-- run this!
 - mq.py
 - mcp3008
