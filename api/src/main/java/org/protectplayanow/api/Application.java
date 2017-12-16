@@ -1,4 +1,4 @@
-package hello;
+package org.protectplayanow.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication(
 scanBasePackages = {
-        "hello"
+        "org.protectplayanow.api"
         })
 public class Application {
 

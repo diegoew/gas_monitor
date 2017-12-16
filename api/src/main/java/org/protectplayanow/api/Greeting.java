@@ -1,4 +1,4 @@
-package hello;
+package org.protectplayanow.api;
 
 public class Greeting {
 
