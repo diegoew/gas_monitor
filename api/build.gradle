@@ -1,11 +1,12 @@
 buildscript {
     repositories {
-        mavenCentral()
         jcenter()
-
+        maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE"
+        classpath "com.netflix.nebula:gradle-extra-configurations-plugin:2.2.1"
     }
 }
 
@@ -13,6 +14,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'nebula.provided-base'
 
 jar {
     baseName = 'gs-rest-service'
@@ -26,10 +28,17 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
+    compile ("org.springframework.boot:spring-boot-starter-web")
     compile ("io.springfox:springfox-swagger2:2.7.0")
     compile ("io.springfox:springfox-swagger-ui:2.7.0")
+
+    compile("org.springframework:spring-jdbc")
+    compile 'mysql:mysql-connector-java'
+
+    provided 'org.projectlombok:lombok:1.16.18'
+
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('com.jayway.jsonpath:json-path')
 }
