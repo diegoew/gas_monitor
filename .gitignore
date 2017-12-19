@@ -1,0 +1,18 @@
+# Generic
+*~
+*.lock
+
+
+# Byte-compiled / optimized / DLL Files
+__pycache__/
+*.py[cod]
+.idea/
+
+
+# Distribution / packaging
+.Python
+env/
+lib/
+
+# Installer Logs
+pip-log.txt
