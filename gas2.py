@@ -3,10 +3,15 @@ import time
 
 from .client.config import Config
 from .client.webService import WebService
-
+import pprint as pp
 
 def run():
 
+# ======================================
+# I kinda canibalized this file, but it
+# didn't look like anyone was using it.
+# - LOL
+# =======================================
     #try:
         print("Press CTRL+C to abort.")
 
@@ -16,7 +21,12 @@ def run():
 
         print("\n## Example GET ##")
         print('Web service says: "{0}"\n'.format(web.getExample()))
-        web.postReading('methane',3)
+        print("## POST READINGS ##")
+        web.postReading("methane",2.07)
+        print("## GET READINGS ##")
+        readings = web.getReadings()
+        pp.pprint('Last 3 readings: "{0}"\n'.format(readings[-3:]))
+        print("Reading Count: {0}".format(len(readings)))
 
  #       mq2 = MQ();
   #      while True:

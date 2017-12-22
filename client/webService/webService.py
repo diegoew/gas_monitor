@@ -1,7 +1,29 @@
+import sys
 import requests
 import datetime
+import json
+
 
 BASE_URI = "http://54.244.200.105/"
+
+def getUserLatLng():
+    # we'll use an API for now to get
+    r = requests.get("http://freegeoip.net/json/")
+
+    try:
+
+        r.raise_for_status()
+        response = r.json()
+
+        latitude = response.get('latitude')
+        longitude = response.get('longitude')
+
+        return (latitude, longitude)
+
+    except:
+        return (None,None)
+
+
 
 class WebService:
 
@@ -9,10 +31,8 @@ class WebService:
         web_service_config = config("WEB_SERVICE")
         self.BASE_URI = BASE_URI
         self.device_id = web_service_config.get('device_id')
-        self.longitude = web_service_config.get('longitude')
-        self.latitude = web_service_config.get('latitude')
-
-        self.unit_of_measure = "ppm"
+        self.latlng = getUserLatLng();
+        self.unit_of_reading = "ppm"
 
 
     def getExample(self):
@@ -24,8 +44,9 @@ class WebService:
             response = r.json()
             content = response.get('content')
             return content
-        except:
-            print("WebService unable to get example!")
+        except requests.exceptions.RequestException as e:
+            print("Webservice error: {0}".format(str(e)))
+            sys.exit(1)
 
 
     def getReadings(self):
@@ -35,33 +56,36 @@ class WebService:
         try:
             r.raise_for_status()
             response = r.json()
-            content = response.get('content')
-            return content
-        except:
-            print("WebService unable to get readings!")
+            #content = response.get('content')
+            return response
+        except requests.exceptions.RequestException as e:
+            print("Webservice error: {0}".format(str(e)))
+            sys.exit(1)
 
 
 
-    def postReading(self, gas_name, reading):
+    def postReading(self, channel_name, reading):
         # server takes iso format
         timestamp = datetime.datetime.now().isoformat()
-        payload = {'reading': reading,
-                   'gasName': gas_name,
-                   'deviceId': self.device_id,
-                   'latitude': float(self.latitude),
-                   'longitude': float(self.longitude)}
-        print('payload: ', str(payload))
+
+        # the Webserver requires our JSON to come as an enumerable object
+        payload = [{"reading": reading,
+                   "gasName": channel_name,
+                   "deviceId": self.device_id,
+                   "latitude": float(self.latlng[0]),
+                   "longitude": float(self.latlng[1]),
+                    "unitOfReading": self.unit_of_reading}]
 
         url = self.BASE_URI + "readings"
-        print("post Url: ", url)
 
         headers = {'content-type': 'application/json'}
 
         r = requests.post(url= url,
-                          data=payload,
+                          data= json.dumps(payload),
                           headers=headers)
-        #try:
-        r.raise_for_status()
-        #    print(str(r.json()))
-        #except:
-        #    print("Webservice unable to post reading!")
+        try:
+            if r.ok:
+                print("{0} data sent successfully!".format(channel_name))
+        except requests.exceptions.RequestException as e:
+            print("Webservice error: {0}".format(str(e)))
+            sys.exit(1)
