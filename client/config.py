@@ -1,6 +1,7 @@
 import os
+import requests
 
-from gas_monitor.client import gasMonitorPath
+from ..client import gasMonitorPath
 from configparser import ConfigParser
 #create config if none exists
 
@@ -22,10 +23,11 @@ def verifyPath():
     return True
 
 
+
 class Config:
     def __init__(self):
         self.parser = ConfigParser()
-        self.data = self.getConfig()
+        self.data = self.data = self.getConfig()
         if self.data == []:
             self.populateDefaults()
             self.data = self.getConfig()
@@ -43,7 +45,6 @@ class Config:
 
         # try to read config file
         try:
-            # with open(config_file, "r") as f:
             parser = ConfigParser()
             parsed = parser.read(config_file)
 
@@ -85,10 +86,9 @@ class Config:
 
 
         ## Web Service ##
-        web_key, web_value = simpleRequest('base_uri', 'What\'s the base URI your gas monitor will be posting to?', str)
+        web_key, web_value = simpleRequest('device_id', 'Please provide your Device ID?', str)
 
         webService[web_key] = web_value
-
 
         ## Write user imputs to file ##
         with open(config_file, 'w') as file:

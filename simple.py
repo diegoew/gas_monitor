@@ -25,7 +25,7 @@ try:
     	pin_one = readadc(0)
     	pin_two = readadc(1)
     	pin_three = readadc(2)
-    	print "---------------------------------------"
+    	print ("---------------------------------------")
     	print("CH0 %g, CH1 %g, CH2 %g" % (pin_one, pin_two, pin_three))
     	time.sleep(delay)
 
