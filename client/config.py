@@ -1,4 +1,5 @@
 import os
+import requests
 
 from gas_monitor.client import gasMonitorPath
 from configparser import ConfigParser
@@ -22,13 +23,29 @@ def verifyPath():
     return True
 
 
+def getUserLatLng():
+    # we'll use an API for now to get
+    r = requests.get("http://freegeoip.net/json/")
+
+    try:
+
+        r.raise_for_status()
+        response = r.json()
+
+        latitude = response.get('latitude')
+        longitude = response.get('longitude')
+
+        return (latitude, longitude)
+
+    except:
+        return (None,None)
+
+
 class Config:
     def __init__(self):
         self.parser = ConfigParser()
+        self.populateDefaults()
         self.data = self.getConfig()
-        if self.data == []:
-            self.populateDefaults()
-            self.data = self.getConfig()
 
 
     def __call__(self,sectionKey ,*args, **kwargs):
@@ -43,7 +60,6 @@ class Config:
 
         # try to read config file
         try:
-            # with open(config_file, "r") as f:
             parser = ConfigParser()
             parsed = parser.read(config_file)
 
@@ -85,10 +101,14 @@ class Config:
 
 
         ## Web Service ##
-        web_key, web_value = simpleRequest('base_uri', 'What\'s the base URI your gas monitor will be posting to?', str)
+        web_key, web_value = simpleRequest('device_id', 'Please provide your Device ID?', str)
 
         webService[web_key] = web_value
 
+        latitude, longitude = getUserLatLng()
+
+        webService["latitude"] = str(latitude)
+        webService["longitude"] = str(longitude)
 
         ## Write user imputs to file ##
         with open(config_file, 'w') as file:
