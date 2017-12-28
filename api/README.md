@@ -11,7 +11,7 @@ You must have [Java 8][java8] installed.
 
 [java8]: http://www.oracle.com/technetwork/java/javase/downloads/
 
-Check that java 8 is by typing the following command:
+Check that java 8 is installed by typing the following command:
 
 $ javac -version
 javac 1.8.0_25
@@ -20,7 +20,7 @@ The response must have '1.8.' in it. If not download the java 8 jdk from the lin
 
 ## Configure MySql Database connection
 
-(Need to add info)
+(Need to add info on which property files to update)
 
 ## Leverage Gradle to run the application locally (SECTION BELOW IS A PLACEHOLDER, bootRun command needs to be added)
 
