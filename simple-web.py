@@ -1,4 +1,4 @@
-# Simplified Version
+# Simplified Version with log and web connection
  
 import spidev
 import time
