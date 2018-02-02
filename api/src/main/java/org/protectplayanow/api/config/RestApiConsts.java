@@ -21,6 +21,22 @@ public class RestApiConsts {
             Methane = "methane",
             formaldehyde = "formaldehyde",
             Benzene = "benzene",
+            lpg = "lpg",
+            h2 = "h2",
+            co = "carbon monoxide",
+            co2 = "carbon dioxide",
+            alcohol = "alcohol",
+            smoke = "smoke",
+            propane = "propane",
+            ammonia = "ammonia",
+            toluene = "toluene",
+            acetone = "acetone",
+
+            //for param "sensorType",
+            mq2 = "MQ-2",
+            mq9 = "MQ-9",
+            mq135 = "MQ-135",
+            sensorTypeList = "[MQ-2],[MQ-9],[MQ-135]",
 
             PleaseSendDeviceIdNextTime = "PleaseSendDeviceIdNextTime"
             ;
@@ -50,6 +66,9 @@ public class RestApiConsts {
             apiGasMessage = "pass in strings " + RestApiConsts.gasKeys + ", or other gas names that sensors have reported"
             ;
 
+
+    public static final String
+            sensorTypeMsg = "must have value " + sensorTypeList;;
 
     public static final double
             latitude = 33.962492,
