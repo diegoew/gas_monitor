@@ -42,7 +42,7 @@ public class GasLevelController {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/readings", method = RequestMethod.GET)
-    public List<Reading> readingsRead(
+    public ResponseEntity<List<Reading>> readingsRead(
 
             @ApiParam(value = RestApiConsts.apiGasMessage)
             @RequestParam(value = "gasName", defaultValue = RestApiConsts.all, required = false)
@@ -64,7 +64,13 @@ public class GasLevelController {
 
         log.info("gasName={}, startDateTime={}, endDateTime={}", gasName, startDateTime, endDateTime);
 
-        return gasLevelRepo.getGasReadings(gasName, startDateTime, endDateTime);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
+
+        return new ResponseEntity<List<Reading>>(
+                gasLevelRepo.getGasReadings(gasName, startDateTime, endDateTime),
+                responseHeaders,
+                HttpStatus.OK);
 
     }
 
@@ -111,6 +117,61 @@ public class GasLevelController {
         log.info("deviceId={}, instant={}, latitude={}, longitude={}", deviceId, instant, latitude, longitude);
 
         gasLevelRepo.saveGasReadings(deviceId, instant, latitude, longitude, readings);
+
+        return new ResponseEntity<Void>(HttpStatus.OK);
+
+    }
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Well done!"),
+            @ApiResponse(code = 400, message = "You are not sending in the proper request. See 'warning' header for info, Buster!"),
+            @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
+    @RequestMapping(value = "/readings/calculate", method = RequestMethod.POST)
+    public ResponseEntity<Void> readingsWriteAfterCalculation(
+
+            @ApiParam(value = "deviceId")
+            @RequestParam(value = "deviceId", defaultValue = RestApiConsts.PleaseSendDeviceIdNextTime, required = false)
+                    String deviceId,
+
+            @ApiParam(value = RestApiConsts.apiInstantDateMessage)
+            @RequestParam(value = "instant", defaultValue = RestApiConsts.now, required = false)
+            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+                    Date instant,
+
+            @ApiParam(value = RestApiConsts.latitudePdr)
+            @RequestParam(value = "latitude", defaultValue = RestApiConsts.latitudePdr, required = false)
+                    double latitude,
+
+            @ApiParam(value = RestApiConsts.longitudePdr)
+            @RequestParam(value = "longitude", defaultValue = RestApiConsts.longitudePdr, required = false)
+                    double longitude,
+
+            @ApiParam(value = RestApiConsts.sensorTypeMsg)
+            @RequestParam(value = "sensorType", defaultValue = RestApiConsts.mq2, required = false)
+                    String sensorType,
+
+            @ApiParam(value = "this is the voltage reading that we will calculate")
+            @RequestParam(value = "reading", required = true)
+                    double reading,
+
+            @ApiParam(value = "this value is determined by calibrating the sensor, if you don't know it we'll use defaults")
+            @RequestParam(value = "ro", defaultValue = "0", required = false)
+                    double ro
+
+    ) {
+
+        log.info("deviceId={}, instant={}, latitude={}, longitude={}", deviceId, instant, latitude, longitude);
+
+        Reading r = Reading.builder()
+                .deviceId(deviceId)
+                .instant(instant)
+                .latitude(latitude)
+                .longitude(longitude)
+                .reading(reading)
+                .sensorType(sensorType)
+                .ro(ro)
+                .build();
+
+        gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
 
         return new ResponseEntity<Void>(HttpStatus.OK);
 

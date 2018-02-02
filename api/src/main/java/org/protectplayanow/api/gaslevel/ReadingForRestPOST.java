@@ -2,15 +2,18 @@ package org.protectplayanow.api.gaslevel;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by vladpopescu on 12/12/17.instant, deviceId, gasName, reading, unitOfReading, latitude, longitude
  */
 @Builder
+@ToString
 public class ReadingForRestPOST {
 
     private String gasName, unitOfReading;
@@ -22,7 +25,7 @@ public class ReadingForRestPOST {
     }
 
     public void setGasName(String gasName) {
-        this.gasName = gasName.toLowerCase();
+        this.gasName = Optional.ofNullable(gasName).orElse("").toLowerCase();
     }
 
     public String getUnitOfReading() {

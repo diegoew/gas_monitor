@@ -12,4 +12,6 @@ public interface GasLevelRepo {
 
     void saveGasReadings(String deviceId, Date instant, double latitude, double longitude, List<ReadingForRestPOST> readings);
 
+    void saveGasReadings(List<Reading> readings);
+
 }

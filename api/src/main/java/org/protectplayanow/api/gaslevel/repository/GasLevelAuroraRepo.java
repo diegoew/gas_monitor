@@ -41,6 +41,7 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
                         .unitOfReading(rs.getString("unitOfReading"))
                         .latitude(rs.getDouble("latitude"))
                         .longitude(rs.getDouble("longitude"))
+                        .sensorType(rs.getString("sensorType"))
                         .build()
         ).forEach(reading -> {
             log.debug(reading.toString());
@@ -80,6 +81,38 @@ VALUES
         }
 
         sb.deleteCharAt(sb.length()-1);
+
+        jdbcTemplate.execute(sb.toString());
+    }
+
+    @Override
+    public void saveGasReadings(List<Reading> readings) {
+
+        String q = " INSERT INTO reading " +
+                " (instant, deviceId, gasName, reading, unitOfReading, latitude, longitude, sensorType) " +
+                " VALUES ";
+
+        StringBuffer sb = new StringBuffer(q);
+
+        for(int i = 0; i < readings.size(); i++){
+
+            Reading r = readings.get(i);
+
+            sb.append("('" + AuroraDbUtils.getDate(r.getInstant()) +
+                    "', '" + r.getDeviceId() +
+                    "', '" + r.getGasName() +
+                    "', " + r.getReading() +
+                    ", '" + r.getUnitOfReading() +
+                    "', " + r.getLatitude() +
+                    ", " + r.getLongitude() +
+                    ", '" + r.getSensorType() + "'" +
+                    "),");
+
+        }
+
+        sb.deleteCharAt(sb.length()-1);
+
+        log.info(sb.toString());
 
         jdbcTemplate.execute(sb.toString());
     }
