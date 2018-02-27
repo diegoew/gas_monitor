@@ -38,3 +38,10 @@ simple-w-c.py
 - logs all events and data to a file called: gasreadings.log
 - does a 50 sample average measurement "in clean air" to calculate RO for each sensor
 - sends RO and raw data to website
+
+Formulas to convert the raw data into ppm gas readings:
+https://docs.google.com/spreadsheets/d/1bb9lcmV_HsYXKDZiz5pghnakAcYF63pO5d78DDjXMT4/edit?usp=sharing
+
+Components for Gas Sensor Device:
+https://docs.google.com/spreadsheets/d/18XvdZh5N7-iELkv8ZHe7yIzBQmGSkL3IdELiQ5KsU-c/edit?usp=sharing
+
