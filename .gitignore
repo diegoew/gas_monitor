@@ -1,0 +1,11 @@
+# Python compiled files
+*.pyc
+
+# PyCharm project directory
+.idea
+
+# Python virtual environment
+venv
+
+# Log files
+*.log
