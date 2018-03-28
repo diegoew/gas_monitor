@@ -11,7 +11,7 @@ import urllib
 logging.basicConfig(filename="gasreadings.log", format = '%(asctime)-15s %(message)s', level=logging.INFO)
 
 #Define Variables
-delay = 5
+delay = 60
 
 #Website Info
 sensorType1 = 'MQ-2'
@@ -33,6 +33,19 @@ def readadc(adcnum):
     r = spi.xfer2([1, 8 + adcnum << 4, 0])
     data = ((r[1] & 3) << 8) + r[2]
     return data
+
+
+def set_reading_frequency(response):
+    reading_frequecy = response.info().get("reading-frequency")
+    sys.stdout.write(" Reading frequency:", delay, "seconds:")
+    try:
+        global delay
+        delay = float(reading_frequecy)
+        sys.stdout.write(" Set")
+        logging.info("Reading frequency:", delay)
+    except ValueError:
+        sys.stdout.write(" Invalid! Use", delay)
+
 
 try:
     print("Press CTRL+C to abort.")
@@ -107,8 +120,9 @@ try:
         data1 = urllib.urlencode(query_args1)
         request1 = urllib2.Request(url1, data1)
         response1 = urllib2.urlopen(request1)
-        
+
         logging.info("MQ-2 %g" % (pin_one))
+        set_reading_frequency(response1)
 
         sys.stdout.flush()
         time.sleep(delay)
@@ -123,8 +137,9 @@ try:
         data2 = urllib.urlencode(query_args2)
         request2 = urllib2.Request(url2, data2)
         response2 = urllib2.urlopen(request2)
-        
+
         logging.info("MQ-9 %g" % (pin_two))
+        set_reading_frequency(response2)
 
         sys.stdout.flush()
         time.sleep(delay)
@@ -139,11 +154,12 @@ try:
         data3 = urllib.urlencode(query_args3)
         request3 = urllib2.Request(url3, data3)
         response3 = urllib2.urlopen(request3)
-        
+
         logging.info("MQ-135 %g" % (pin_three))
+        set_reading_frequency(response1)
 
         sys.stdout.flush()
-        time.sleep(delay)    
+        time.sleep(delay)
 
 except:
     print("\nAbort by user")
