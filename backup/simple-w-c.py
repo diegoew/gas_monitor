@@ -11,7 +11,7 @@ import urllib
 logging.basicConfig(filename="gasreadings.log", format = '%(asctime)-15s %(message)s', level=logging.INFO)
 
 #Define Variables
-delay = 240
+delay = 5
 
 #Website Info
 sensorType1 = 'MQ-2'
@@ -45,7 +45,7 @@ try:
     val1 = 0.0
     for i in range(50):
         val1 += readadc(0)
-        time.sleep(0.5)
+        time.sleep(5/1000)
 
     val1 = val1/50
 
@@ -64,7 +64,7 @@ try:
     val2 = 0.0
     for i in range(50):
         val2 += readadc(1)
-        time.sleep(0.5)
+        time.sleep(5/1000)
 
     val2 = val2/50
 
@@ -83,7 +83,7 @@ try:
     val3 = 0.0
     for i in range(50):
         val3 += readadc(2)
-        time.sleep(0.5)
+        time.sleep(5/1000)
 
     val3 = val3/50
 

@@ -11,7 +11,7 @@ import urllib
 logging.basicConfig(filename="gasreadings.log", format = '%(asctime)-15s %(message)s', level=logging.INFO)
 
 #Define Variables
-delay = 240
+delay = 60
 
 #Website Info
 sensorType1 = 'MQ-2'
@@ -34,6 +34,19 @@ def readadc(adcnum):
     data = ((r[1] & 3) << 8) + r[2]
     return data
 
+
+def set_reading_frequency(response):
+    reading_frequecy = response.info().get("reading-frequency")
+    sys.stdout.write(" Reading frequency:", delay, "seconds:")
+    try:
+        global delay
+        delay = float(reading_frequecy)
+        sys.stdout.write(" Set")
+        logging.info("Reading frequency:", delay)
+    except ValueError:
+        sys.stdout.write(" Invalid! Use", delay)
+
+
 try:
     print("Press CTRL+C to abort.")
     logging.info("Program Started")
@@ -45,7 +58,7 @@ try:
     val1 = 0.0
     for i in range(50):
         val1 += readadc(0)
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     val1 = val1/50
 
@@ -64,7 +77,7 @@ try:
     val2 = 0.0
     for i in range(50):
         val2 += readadc(1)
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     val2 = val2/50
 
@@ -83,7 +96,7 @@ try:
     val3 = 0.0
     for i in range(50):
         val3 += readadc(2)
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     val3 = val3/50
 
@@ -109,6 +122,8 @@ try:
         response1 = urllib2.urlopen(request1)
         
         logging.info("MQ-2 %g" % (pin_one))
+        #set_reading_frequency(response1)
+        print response1
 
         sys.stdout.flush()
         time.sleep(delay)
@@ -125,6 +140,8 @@ try:
         response2 = urllib2.urlopen(request2)
         
         logging.info("MQ-9 %g" % (pin_two))
+        #set_reading_frequency(response2)
+        print response2
 
         sys.stdout.flush()
         time.sleep(delay)
@@ -141,6 +158,8 @@ try:
         response3 = urllib2.urlopen(request3)
         
         logging.info("MQ-135 %g" % (pin_three))
+        #set_reading_frequency(response3)
+        print response3
 
         sys.stdout.flush()
         time.sleep(delay)    

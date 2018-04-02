@@ -1,18 +1,11 @@
-# Generic
-*~
-*.lock
+# Python compiled files
+*.pyc
 
+# PyCharm project directory
+.idea
 
-# Byte-compiled / optimized / DLL Files
-__pycache__/
-*.py[cod]
-.idea/
+# Python virtual environment
+venv
 
-
-# Distribution / packaging
-.Python
-env/
-lib/
-
-# Installer Logs
-pip-log.txt
+# Log files
+*.log
