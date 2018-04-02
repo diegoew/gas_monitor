@@ -32,6 +32,11 @@ public class RestApiConsts {
             toluene = "toluene",
             acetone = "acetone",
 
+            get = "get",
+            set = "set",
+
+            readingFrequency = "reading-frequency",
+
             //for param "sensorType",
             mq2 = "MQ-2",
             mq9 = "MQ-9",

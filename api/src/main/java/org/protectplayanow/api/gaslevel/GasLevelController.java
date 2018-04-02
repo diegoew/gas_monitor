@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.swagger.annotations.*;
@@ -31,12 +32,50 @@ public class GasLevelController {
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
+    public static final ConcurrentHashMap<String, String> globalValueMap = new ConcurrentHashMap<>();
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
     @Autowired
     GasLevelRepo gasLevelRepo;
+
+
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Well done!"),
+            @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
+    @RequestMapping(value = "/glovalValue", method = RequestMethod.GET)
+    public ResponseEntity<List<Reading>> setOrGetGlobalValue(
+
+            @ApiParam(value = "use this endpoint to get and set global values")
+            @RequestParam(value = "action", defaultValue = RestApiConsts.get, required = true)
+                    String action,
+
+            @ApiParam(value = RestApiConsts.apiDateMessage)
+            @RequestParam(value = "key", defaultValue = RestApiConsts.yearago, required = false)
+            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+                    Date startDateTime,
+
+            @ApiParam(value = RestApiConsts.apiDateMessage)
+            @RequestParam(value = "value", defaultValue = RestApiConsts.now, required = false)
+            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+                    Date endDateTime
+
+    ) {
+
+        List<Reading> readings = new ArrayList<>();
+
+        log.info("gasName={}, startDateTime={}, endDateTime={}", action, startDateTime, endDateTime);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
+
+        return new ResponseEntity<List<Reading>>(
+                gasLevelRepo.getGasReadings(action, startDateTime, endDateTime),
+                responseHeaders,
+                HttpStatus.OK);
+
+    }
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Well done!"),
