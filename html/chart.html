@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Gas Sensors - Protect Playa Now</title><meta property="og:site_name" content="Protect Playa Now" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css">
+</head>
+<body>
+<div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js"></script>
+    <input id="ajaxtest" type="button" value="Make Get Request" hidden="true"></input>
+    <p>Start: <input type="button" id="startPicker" value="pick a date"></p>
+    <p>End: <input type="button" id="endPicker" value="pick a date"></p>
+    <br/>
+    <br/>
+    <button id="change">Change chart</button>
+    <div id="chart_div"></div>
+    <script>
+$("#ajaxtest").click(function(){
+
+console.log("sending ajax request at: " + new Date());
+
+var url = "http://54.244.200.105/readings?gasName=all&startDateTime=2018-04-02T13%3A14%3A15-00%3A00&endDateTime=2018-04-03T13%3A14%3A15-00%3A00";
+
+$.getJSON( url, function( data ) {
+
+    var lastElem = data[data.length-1];
+
+    console.log("ajax request returned at: " + new Date());
+
+    alert('Last element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2));
+
+});
+
+});
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+            hours = '' + d.getHours();
+            minutes = '' + d.getMinutes();
+            seconds = '' + d.getSeconds();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+        if (hours.length < 2) hours = '0' + hours;
+        if (minutes.length < 2) minutes = '0' + minutes;
+        if (seconds.length < 2) seconds = '0' + seconds;
+
+        //"yyyy-MM-dd'T'HH:mm:ssXXX"
+        var d = [year, month, day].join('-') + "T" + hours + ":" + minutes + ":" + seconds + "-08:00";
+
+        console.log("formatted date: " + d);
+
+        //2012-12-20T13:14:15-00:00
+        //2018-04-03'T'00:00:00-08:00
+
+        return d;
+    }
+
+
+  $( function() {
+
+    $( "#startPicker" ).datepicker({
+
+    onSelect: function(datetext){
+
+        var d = new Date(); // for now
+
+        var h = d.getHours();
+        h = (h < 10) ? ("0" + h) : h ;
+
+        var m = d.getMinutes();
+        m = (m < 10) ? ("0" + m) : m ;
+
+        var s = d.getSeconds();
+        s = (s < 10) ? ("0" + s) : s ;
+
+        datetext = datetext + " " + h + ":" + m + ":" + s;
+
+        $('#startPicker').val(datetext);
+    }
+
+    });
+
+  } );
+
+  $( function() {
+
+    $( "#endPicker" ).datepicker({
+
+    onSelect: function(datetext){
+
+        var d = new Date(); // for now
+
+        var h = d.getHours();
+        h = (h < 10) ? ("0" + h) : h ;
+
+        var m = d.getMinutes();
+        m = (m < 10) ? ("0" + m) : m ;
+
+        var s = d.getSeconds();
+        s = (s < 10) ? ("0" + s) : s ;
+
+        datetext = datetext + " " + h + ":" + m + ":" + s;
+
+        $('#endPicker').val(datetext);
+    }
+
+    });
+
+  } );
+
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('datetime', 'Time of Day');
+      data.addColumn('number', 'Methane');
+
+      data.addRows([
+        [new Date(2015, 0, 1, 0), 5],    [new Date(2015, 0, 1, 0, 30), 5.1],
+        [new Date(2015, 0, 1, 1), 6.2],  [new Date(2015, 0, 1, 2), 7],
+        [new Date(2015, 0, 1, 3), 6.4],  [new Date(2015, 0, 1, 4), 3],
+        [new Date(2015, 0, 1, 5), 4],    [new Date(2015, 0, 1, 6), 4.2],
+        [new Date(2015, 0, 1, 7), 1],    [new Date(2015, 0, 1, 8), 2.7],
+        [new Date(2015, 0, 1, 9), 3.9],  [new Date(2015, 0, 1, 10), 3.8],
+        [new Date(2015, 0, 1, 11), 5],   [new Date(2015, 0, 1, 12), 6.2],
+        [new Date(2015, 0, 1, 13), 7.8], [new Date(2015, 0, 1, 14), 9.1],
+        [new Date(2015, 0, 1, 15), 8],   [new Date(2015, 0, 1, 16), 6.8],
+        [new Date(2015, 0, 1, 17), 7.2], [new Date(2015, 0, 1, 18), 4],
+        [new Date(2015, 0, 1, 19), 5.9], [new Date(2015, 0, 1, 20), 6.3],
+        [new Date(2015, 0, 1, 21), 6],   [new Date(2015, 0, 1, 22), 3],
+        [new Date(2015, 0, 1, 23), 2.2], [new Date(2015, 0, 2, 0), 2.4],
+        [new Date(2015, 0, 2, 1), 3.6],  [new Date(2015, 0, 2, 2), 4],
+        [new Date(2015, 0, 2, 3), 5.5],  [new Date(2015, 0, 2, 4), 7.1],
+        [new Date(2015, 0, 2, 5), 6],    [new Date(2015, 0, 2, 6), 7.8],
+        [new Date(2015, 0, 2, 7), 8.2],  [new Date(2015, 0, 2, 8), 9],
+      ]);
+
+      var options = {
+        /*
+        width: 900,
+        height: 500,
+        legend: {position: 'none'},*/
+        chartArea: {
+          width: '55%'
+        },
+        enableInteractivity: true,
+        vAxis: {
+          title: 'Parts Per Million'
+        },
+        hAxis: {
+          /* viewWindow: {
+            min: new Date(2014, 11, 31, 18),
+            max: new Date(2015, 0, 3, 1)
+          }, */
+          gridlines: {
+            count: -1,
+            units: {
+              days: {format: ['MMM dd']},
+              hours: {format: ['HH:mm', 'ha']},
+            }
+          },
+          minorGridlines: {
+            units: {
+              hours: {format: ['hh:mm:ss a', 'ha']},
+              minutes: {format: ['HH:mm a Z', ':mm']}
+            }
+          }
+        }
+      };
+
+      var chart = new google.visualization.LineChart(
+        document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+
+      var button = document.getElementById('change');
+      var isChanged = false;
+
+      button.onclick = function () {
+
+        var now = new Date();
+
+        var startTime = new Date(now.toDateString());
+        startTime.setDate(startTime.getDate()-1);
+
+        var endTime = now;
+
+        console.log("value: " + $( "#endPicker" ).val());
+
+        if($( "#endPicker" ).val() != "pick a date"){
+            endTime = new Date($( "#endPicker" ).val());
+        }
+        if($( "#startPicker" ).val() != "pick a date"){
+            startTime = new Date($( "#startPicker" ).val());
+        }
+
+        var url1 = "http://54.244.200.105/readings?gasName=methane&startDateTime=";
+        var startDateStr = formatDate(startTime);
+        var endDateStr = formatDate(endTime);
+
+        var url = url1 + startDateStr + "&endDateTime=" + endDateStr;
+
+        console.log("url: " + url);
+
+        $.getJSON( url, function( dataReturned ) {
+
+            var lastElem = dataReturned[dataReturned.length-1];
+
+            console.log("ajax request returned dataReturned size: " + dataReturned.length);
+
+
+
+                 data = new google.visualization.DataTable();
+                 data.addColumn('datetime', 'Time of Day');
+                 data.addColumn('number', 'Methane');
+
+                console.log('Last element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2));
+                chart.clearChart();
+
+                for( i = 0; i < dataReturned.length; i++ ) {
+
+                    console.log("instant: " + dataReturned[i].instant + " reading: " + dataReturned[i].reading);
+
+                    data.addRows([
+                        [new Date(dataReturned[i].instant), dataReturned[i].reading]
+                      ]);
+
+                }
+
+
+
+        chart.draw(data, options);
+
+        });
+
+      };
+    }
+</script>
+</div>
+
+
+
+
+</body>
+</html>
