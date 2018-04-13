@@ -22,15 +22,17 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Reading> getGasReadings(String gasName, Date startDateTime, Date endDateTime) {
+    public List<Reading> getGasReadings(String gasName, Date startDateTime, Date endDateTime, String sensorType, String deviceId) {
 
         List<Reading> readings = new ArrayList<>();
 
         jdbcTemplate.query(
                 "SELECT * from reading WHERE " +
                         (gasName.equals(RestApiConsts.all) ? "" : " gasName in " + AuroraDbUtils.getInClauseList(gasName) + " and ") +
-                        "instant >= '" + AuroraDbUtils.getDate(startDateTime) +
-                        "' and instant <= '" + AuroraDbUtils.getDate(endDateTime) + "'" +
+                        " deviceId = '" + deviceId + "' and " +
+                        " sensorType = '" + sensorType + "' and " +
+                        " instant >= '" + AuroraDbUtils.getDate(startDateTime) +
+                        " ' and instant <= '" + AuroraDbUtils.getDate(endDateTime) + "'" +
                         " order by instant desc",
                 new Object[] { },
                 (rs, rowNum) -> Reading.builder()

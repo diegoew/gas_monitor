@@ -105,14 +105,22 @@ public class GasLevelController {
                     String gasName,
 
             @ApiParam(value = RestApiConsts.apiDateMessage)
-            @RequestParam(value = "startDateTime", defaultValue = RestApiConsts.yearago, required = false)
+            @RequestParam(value = "startDateTime", defaultValue = RestApiConsts.dayago, required = false)
             @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
                     Date startDateTime,
 
             @ApiParam(value = RestApiConsts.apiDateMessage)
             @RequestParam(value = "endDateTime", defaultValue = RestApiConsts.now, required = false)
             @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
-                    Date endDateTime
+                    Date endDateTime,
+
+            @ApiParam(value = "sensorType")
+            @RequestParam(value = "sensorType", defaultValue = RestApiConsts.mq9, required = false)
+                    String sensorName,
+
+            @ApiParam(value = "deviceId")
+            @RequestParam(value = "deviceId", defaultValue = RestApiConsts.deviceId, required = false)
+                    String deviceId
 
             ) {
 
@@ -123,7 +131,7 @@ public class GasLevelController {
         HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
 
         return new ResponseEntity<List<Reading>>(
-                gasLevelRepo.getGasReadings(gasName, startDateTime, endDateTime),
+                gasLevelRepo.getGasReadings(gasName, startDateTime, endDateTime, sensorName, deviceId),
                 responseHeaders,
                 HttpStatus.OK);
 

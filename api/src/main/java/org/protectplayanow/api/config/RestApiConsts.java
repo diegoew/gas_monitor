@@ -34,6 +34,8 @@ public class RestApiConsts {
             toluene = "toluene",
             acetone = "acetone",
 
+            deviceId = "RaspPi-Prototype-1",
+
             get = "get",
             set = "set",
 
