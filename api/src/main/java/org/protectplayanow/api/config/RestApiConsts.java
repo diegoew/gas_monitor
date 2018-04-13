@@ -1,5 +1,7 @@
 package org.protectplayanow.api.config;
 
+import org.springframework.http.HttpHeaders;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ public class RestApiConsts {
             set = "set",
 
             readingFrequency = "reading-frequency",
+            readingFreq70 = "60",
 
             //for param "sensorType",
             mq2 = "MQ-2",
@@ -86,5 +89,14 @@ public class RestApiConsts {
                     ;
 
 
+    public static HttpHeaders makeGlobalHeaders(String readingFrequency){
 
+        HttpHeaders responseHeaders = new HttpHeaders();
+
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
+        responseHeaders.set(RestApiConsts.readingFrequency, readingFrequency);
+
+        return responseHeaders;
+
+    }
 }

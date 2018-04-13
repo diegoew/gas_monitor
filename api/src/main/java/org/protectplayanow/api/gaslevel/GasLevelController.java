@@ -33,6 +33,9 @@ public class GasLevelController {
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
     public static final ConcurrentHashMap<String, String> globalValueMap = new ConcurrentHashMap<>();
+    static {
+        globalValueMap.put( RestApiConsts.readingFrequency, RestApiConsts.readingFreq70 );
+    }
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -44,34 +47,48 @@ public class GasLevelController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
-    @RequestMapping(value = "/glovalValue", method = RequestMethod.GET)
-    public ResponseEntity<List<Reading>> setOrGetGlobalValue(
+    @RequestMapping(value = "/globalValue", method = RequestMethod.GET)
+    public ResponseEntity<String> setOrGetGlobalValue(
 
             @ApiParam(value = "use this endpoint to get and set global values")
             @RequestParam(value = "action", defaultValue = RestApiConsts.get, required = true)
                     String action,
 
-            @ApiParam(value = RestApiConsts.apiDateMessage)
-            @RequestParam(value = "key", defaultValue = RestApiConsts.yearago, required = false)
+            @ApiParam(value = "enter the value 'key' aka value 'name'")
+            @RequestParam(value = "key", defaultValue = RestApiConsts.readingFrequency, required = false)
             @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
-                    Date startDateTime,
+                    String key,
 
-            @ApiParam(value = RestApiConsts.apiDateMessage)
-            @RequestParam(value = "value", defaultValue = RestApiConsts.now, required = false)
+            @ApiParam(value = "enter the new value for the key that you are sending")
+            @RequestParam(value = "value", defaultValue = RestApiConsts.readingFreq70, required = false)
             @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
-                    Date endDateTime
+                    String value
 
     ) {
 
         List<Reading> readings = new ArrayList<>();
 
-        log.info("gasName={}, startDateTime={}, endDateTime={}", action, startDateTime, endDateTime);
+        log.info("action={}, key={}, value={}", action, key, value);
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Access-Control-Allow-Origin", "*");
+        String previousValue = globalValueMap.get( key );
 
-        return new ResponseEntity<List<Reading>>(
-                gasLevelRepo.getGasReadings(action, startDateTime, endDateTime),
+        log.info("previousValue={}", previousValue);
+
+        if( action.equals( RestApiConsts.get ) ) {
+            value = globalValueMap.get( key );
+        } else if ( action.equals( RestApiConsts.set ) ) {
+            value = globalValueMap.put( key, value );
+        }
+
+        value = globalValueMap.get( key );
+
+        HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
+
+        return new ResponseEntity<String>(
+                "thanks for submitting a '" + action +
+                        "' request, the value for '" + key +
+                        "' is '" + value + "' the previous value was '" + previousValue +
+                        "'",
                 responseHeaders,
                 HttpStatus.OK);
 
@@ -103,8 +120,7 @@ public class GasLevelController {
 
         log.info("gasName={}, startDateTime={}, endDateTime={}", gasName, startDateTime, endDateTime);
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Access-Control-Allow-Origin", "*");
+        HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
 
         return new ResponseEntity<List<Reading>>(
                 gasLevelRepo.getGasReadings(gasName, startDateTime, endDateTime),
@@ -157,7 +173,9 @@ public class GasLevelController {
 
         gasLevelRepo.saveGasReadings(deviceId, instant, latitude, longitude, readings);
 
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<Void>(
+                RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency)),
+                HttpStatus.OK);
 
     }
     @ApiResponses(value = {
@@ -212,7 +230,9 @@ public class GasLevelController {
 
         gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
 
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<Void>(RestApiConsts.makeGlobalHeaders(
+                globalValueMap.get(RestApiConsts.readingFrequency)),
+                HttpStatus.OK);
 
     }
 
@@ -266,7 +286,7 @@ public class GasLevelController {
     public Greeting greeting(@RequestParam(value="name", defaultValue="World of Gas Monitoring") String name) {
 
         jdbcTemplate.query(
-                "SELECT * from reading WHERE 1 = ?", new Object[] { 1 },
+                "SELECT * from reading order by instance desc limit 5", new Object[] { 1 },
                 (rs, rowNum) -> Reading.builder()
                         .instant(new Date(rs.getTimestamp("instant").getTime()))
                         .deviceId(rs.getString("deviceId"))
