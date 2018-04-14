@@ -21,7 +21,7 @@ $("#ajaxtest").click(function(){
 
 console.log("sending ajax request at: " + new Date());
 
-var url = "http://54.244.200.105/readings?gasName=all&startDateTime=2018-04-02T13%3A14%3A15-00%3A00&endDateTime=2018-04-03T13%3A14%3A15-00%3A00";
+var url = "http://34.213.144.139/readings?gasName=all&startDateTime=2018-04-02T13%3A14%3A15-00%3A00&endDateTime=2018-04-03T13%3A14%3A15-00%3A00";
 
 $.getJSON( url, function( data ) {
 
@@ -202,7 +202,7 @@ $.getJSON( url, function( data ) {
             startTime = new Date($( "#startPicker" ).val());
         }
 
-        var url1 = "http://54.244.200.105/readings?gasName=methane&startDateTime=";
+        var url1 = "http://34.213.144.139/readings?gasName=methane&startDateTime=";
         var startDateStr = formatDate(startTime);
         var endDateStr = formatDate(endTime);
 
@@ -227,7 +227,7 @@ $.getJSON( url, function( data ) {
 
                 for( i = 0; i < dataReturned.length; i++ ) {
 
-                    console.log("instant: " + dataReturned[i].instant + " reading: " + dataReturned[i].reading);
+                    //console.log("instant: " + dataReturned[i].instant + " reading: " + dataReturned[i].reading);
 
                     data.addRows([
                         [new Date(dataReturned[i].instant), dataReturned[i].reading]
