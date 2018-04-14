@@ -46,7 +46,7 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
                         .sensorType(rs.getString("sensorType"))
                         .build()
         ).forEach(reading -> {
-            log.debug(reading.toString());
+            //log.debug(reading.toString());
             readings.add(reading);
         });
 

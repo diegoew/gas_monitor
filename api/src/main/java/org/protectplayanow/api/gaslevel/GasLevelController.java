@@ -25,8 +25,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Api(description = "These example endpoints don't do anything. But they will respond" +
-        " if you call them correctly.")
+@Api(description = "These endpoints allow you stora and retrieve data.")
 @Slf4j
 public class GasLevelController {
 
