@@ -1,0 +1,382 @@
+<html>
+<head>
+<title>chart.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #999999; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,0); }
+.s1 { color: rgb(0,0,255); font-weight: bold; }
+.s2 { color: rgb(0,0,0); }
+.s3 { color: rgb(0,0,128); font-weight: bold; }
+.s4 { color: rgb(0,128,0); font-weight: bold; }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+chart.html</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">&lt;!DOCTYPE </span><span class="s1">html</span><span class="s0">&gt;</span><span class="s2"> 
+</span><span class="s0">&lt;</span><span class="s3">html </span><span class="s1">lang=</span><span class="s4">&quot;en&quot;</span><span class="s0">&gt;</span><span class="s2"> 
+</span><span class="s0">&lt;</span><span class="s3">head</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">title</span><span class="s0">&gt;</span><span class="s2">Gas Sensors - Protect Playa Now</span><span class="s0">&lt;/</span><span class="s3">title</span><span class="s0">&gt;&lt;</span><span class="s3">meta </span><span class="s1">property=</span><span class="s4">&quot;og:site_name&quot; </span><span class="s1">content=</span><span class="s4">&quot;Protect Playa Now&quot; </span><span class="s0">/&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">script </span><span class="s1">type=</span><span class="s4">&quot;text/javascript&quot; </span><span class="s1">src=</span><span class="s4">&quot;https://www.gstatic.com/charts/loader.js&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">script</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">link </span><span class="s1">rel=</span><span class="s4">&quot;stylesheet&quot; </span><span class="s1">href=</span><span class="s4">&quot;https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css&quot;</span><span class="s0">&gt;</span><span class="s2"> 
+</span><span class="s0">&lt;/</span><span class="s3">head</span><span class="s0">&gt;</span><span class="s2"> 
+</span><span class="s0">&lt;</span><span class="s3">body</span><span class="s0">&gt;</span><span class="s2"> 
+</span><span class="s0">&lt;</span><span class="s3">div</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">script </span><span class="s1">src=</span><span class="s4">'https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'</span><span class="s0">&gt;&lt;/</span><span class="s3">script</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">script </span><span class="s1">src=</span><span class="s4">&quot;https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">script</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">p</span><span class="s0">&gt;</span><span class="s2">Start: </span><span class="s0">&lt;</span><span class="s3">input </span><span class="s1">type=</span><span class="s4">&quot;button&quot; </span><span class="s1">id=</span><span class="s4">&quot;startPicker&quot; </span><span class="s1">value=</span><span class="s4">&quot;pick a date&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">p</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">p</span><span class="s0">&gt;</span><span class="s2">End: </span><span class="s0">&lt;</span><span class="s3">input </span><span class="s1">type=</span><span class="s4">&quot;button&quot; </span><span class="s1">id=</span><span class="s4">&quot;endPicker&quot; </span><span class="s1">value=</span><span class="s4">&quot;pick a date&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">p</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">br</span><span class="s0">/&gt;</span><span class="s2"> 
+    Show last 6 hours: </span><span class="s0">&lt;</span><span class="s3">input </span><span class="s1">type=</span><span class="s4">&quot;button&quot; </span><span class="s1">id=</span><span class="s4">&quot;hours6&quot; </span><span class="s1">value=</span><span class="s4">&quot;past 6 hours&quot;</span><span class="s0">&gt; &lt;</span><span class="s3">br </span><span class="s0">/&gt;</span><span class="s2"> 
+    Show last 6 hours: </span><span class="s0">&lt;</span><span class="s3">input </span><span class="s1">type=</span><span class="s4">&quot;button&quot; </span><span class="s1">id=</span><span class="s4">&quot;hours12&quot; </span><span class="s1">value=</span><span class="s4">&quot;past 12 hours&quot;</span><span class="s0">&gt; &lt;</span><span class="s3">br </span><span class="s0">/&gt;</span><span class="s2"> 
+    Show last 6 hours: </span><span class="s0">&lt;</span><span class="s3">input </span><span class="s1">type=</span><span class="s4">&quot;button&quot; </span><span class="s1">id=</span><span class="s4">&quot;hours24&quot; </span><span class="s1">value=</span><span class="s4">&quot;past 24 hours&quot;</span><span class="s0">&gt; &lt;</span><span class="s3">br </span><span class="s0">/&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">br</span><span class="s0">/&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">button </span><span class="s1">id=</span><span class="s4">&quot;change&quot;</span><span class="s0">&gt;</span><span class="s2">Change chart</span><span class="s0">&lt;/</span><span class="s3">button</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">div </span><span class="s1">id=</span><span class="s4">&quot;chart_div&quot;</span><span class="s0">&gt;&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span><span class="s2"> 
+    </span><span class="s0">&lt;</span><span class="s3">script</span><span class="s0">&gt;</span><span class="s2"> 
+ 
+    google.charts.load('current', {'packages':['corechart']}); 
+    google.charts.setOnLoadCallback(drawChart); 
+    var theChart = null; 
+ 
+    function formatDate(date) { 
+        var d = new Date(date), 
+            month = '' + (d.getMonth() + 1), 
+            day = '' + d.getDate(), 
+            year = d.getFullYear(); 
+            hours = '' + d.getHours(); 
+            minutes = '' + d.getMinutes(); 
+            seconds = '' + d.getSeconds(); 
+ 
+        if (month.length &lt; 2) month = '0' + month; 
+        if (day.length &lt; 2) day = '0' + day; 
+        if (hours.length &lt; 2) hours = '0' + hours; 
+        if (minutes.length &lt; 2) minutes = '0' + minutes; 
+        if (seconds.length &lt; 2) seconds = '0' + seconds; 
+ 
+        //&quot;yyyy-MM-dd'T'HH:mm:ssXXX&quot; 
+        var d = [year, month, day].join('-') + &quot;T&quot; + hours + &quot;:&quot; + minutes + &quot;:&quot; + seconds + &quot;-08:00&quot;; 
+ 
+        console.log(&quot;formatted date: &quot; + d); 
+ 
+        //2012-12-20T13:14:15-00:00 
+        //2018-04-03'T'00:00:00-08:00 
+ 
+        return d; 
+    } 
+ 
+ 
+  $( function() { 
+ 
+    $( &quot;#startPicker&quot; ).datepicker({ 
+ 
+    onSelect: function(datetext){ 
+ 
+        var d = new Date(); // for now 
+ 
+        var h = d.getHours(); 
+        h = (h &lt; 10) ? (&quot;0&quot; + h) : h ; 
+ 
+        var m = d.getMinutes(); 
+        m = (m &lt; 10) ? (&quot;0&quot; + m) : m ; 
+ 
+        var s = d.getSeconds(); 
+        s = (s &lt; 10) ? (&quot;0&quot; + s) : s ; 
+ 
+        datetext = datetext + &quot; &quot; + h + &quot;:&quot; + m + &quot;:&quot; + s; 
+ 
+        $('#startPicker').val(datetext); 
+    } 
+ 
+    }); 
+ 
+  } ); 
+ 
+  function makeDateStr(date){ 
+        var d = date; // for now 
+ 
+        var year = d.getFullYear(); 
+ 
+        var month = d.getMonth(); 
+        month = month &lt; 10 ? (&quot;0&quot; + month) : month; 
+ 
+        var dayOfMonth = d.getDate(); 
+        dayOfMonth = dayOfMonth &lt; 10 ? (&quot;0&quot; + dayOfMonth) : dayOfMonth; 
+ 
+        var h = d.getHours(); 
+        h = (h &lt; 10) ? (&quot;0&quot; + h) : h ; 
+ 
+        var m = d.getMinutes(); 
+        m = (m &lt; 10) ? (&quot;0&quot; + m) : m ; 
+ 
+        var s = d.getSeconds(); 
+        s = (s &lt; 10) ? (&quot;0&quot; + s) : s ; 
+ 
+        return month + &quot;/&quot; + dayOfMonth + &quot;/&quot; + year + &quot; &quot; + h + &quot;:&quot; + m + &quot;:&quot; + s; 
+  } 
+ 
+  function subtractHoursFromDate(date, hours) { 
+    date.setMinutes(date.getMinutes() - 60 * hours); 
+    return date; 
+  } 
+ 
+  $( &quot;#hours6&quot; ).val( 'Show data since ' + makeDateStr( subtractHoursFromDate( new Date(), 6 ) ) ); 
+  $( &quot;#hours12&quot; ).val( 'Show data since ' + makeDateStr( subtractHoursFromDate( new Date(), 12 ) ) ); 
+  $( &quot;#hours24&quot; ).val( 'Show data since ' + makeDateStr( subtractHoursFromDate( new Date(), 24 ) ) ); 
+ 
+  document.getElementById('hours6').onclick = function () { 
+        var da = new Date(); 
+        console.log( &quot;shermans office &quot;  + makeDateStr( subtractHoursFromDate( da, 6 ) ) ); 
+ 
+        drawChartWithDate( subtractHoursFromDate( da, 6 ), da, &quot;34.213.144.139&quot; ) 
+   } 
+ 
+  function drawChartWithDate(startTime, endTime, urlRoot){ 
+ 
+        // var url1 = &quot;http://34.213.144.139/readings?gasName=methane&amp;startDateTime=&quot;; 
+        var url1 = &quot;http://&quot; + urlRoot + &quot;/readings?gasName=methane&amp;startDateTime=&quot;; 
+        var startDateStr = formatDate(startTime); 
+        var endDateStr = formatDate(endTime); 
+ 
+        var url = url1 + startDateStr + &quot;&amp;endDateTime=&quot; + endDateStr; 
+ 
+        console.log(&quot;url: &quot; + url); 
+ 
+        $.getJSON( url, function( dataReturned ) { 
+ 
+            var lastElem = dataReturned[dataReturned.length-1]; 
+ 
+            console.log(&quot;ajax request returned dataReturned size: &quot; + dataReturned.length); 
+ 
+ 
+ 
+                 data = new google.visualization.DataTable(); 
+                 data.addColumn('datetime', 'Time of Day'); 
+                 data.addColumn('number', 'Methane'); 
+ 
+                console.log('Last element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2)); 
+                chart.clearChart(); 
+ 
+                for( i = 0; i &lt; dataReturned.length; i++ ) { 
+ 
+                    //console.log(&quot;instant: &quot; + dataReturned[i].instant + &quot; reading: &quot; + dataReturned[i].reading); 
+ 
+                    data.addRows([ 
+                        [new Date(dataReturned[i].instant), dataReturned[i].reading] 
+                      ]); 
+ 
+                } 
+ 
+                chart.draw(data, options); 
+ 
+        }); 
+ 
+  } 
+ 
+  $( function() { 
+ 
+    $( &quot;#endPicker&quot; ).datepicker({ 
+ 
+    onSelect: function(datetext){ 
+ 
+        var d = new Date(); // for now 
+ 
+        var h = d.getHours(); 
+        h = (h &lt; 10) ? (&quot;0&quot; + h) : h ; 
+ 
+        var m = d.getMinutes(); 
+        m = (m &lt; 10) ? (&quot;0&quot; + m) : m ; 
+ 
+        var s = d.getSeconds(); 
+        s = (s &lt; 10) ? (&quot;0&quot; + s) : s ; 
+ 
+        datetext = datetext + &quot; &quot; + h + &quot;:&quot; + m + &quot;:&quot; + s; 
+ 
+        $('#endPicker').val(datetext); 
+    } 
+ 
+    }); 
+ 
+  } ); 
+ 
+    function drawChart(startTime, endTime) { 
+ 
+        var url1 = &quot;http://34.213.144.139/readings?gasName=methane&amp;startDateTime=&quot;; 
+        var startDateStr = formatDate(startTime);//04/10/2018 21:13:13 
+        var endDateStr = formatDate(endTime); 
+ 
+        var url = url1 + startDateStr + &quot;&amp;endDateTime=&quot; + endDateStr; 
+ 
+        console.log(&quot;url: &quot; + url); 
+ 
+        $.getJSON( url, function( dataReturned ) { 
+ 
+            var lastElem = dataReturned[dataReturned.length-1]; 
+ 
+            console.log(&quot;ajax request returned dataReturned size: &quot; + dataReturned.length); 
+ 
+ 
+ 
+                 data = new google.visualization.DataTable(); 
+                 data.addColumn('datetime', 'Time of Day'); 
+                 data.addColumn('number', 'Methane'); 
+ 
+                console.log('Last element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2)); 
+                chart.clearChart(); 
+ 
+                for( i = 0; i &lt; dataReturned.length; i++ ) { 
+ 
+                    //console.log(&quot;instant: &quot; + dataReturned[i].instant + &quot; reading: &quot; + dataReturned[i].reading); 
+ 
+                    data.addRows([ 
+                        [new Date(dataReturned[i].instant), dataReturned[i].reading] 
+                      ]); 
+ 
+                } 
+ 
+ 
+ 
+        chart.draw(data, options); 
+ 
+        }); 
+ 
+      var data = new google.visualization.DataTable(); 
+      data.addColumn('datetime', 'Time of Day'); 
+      data.addColumn('number', 'Methane'); 
+ 
+      data.addRows([ 
+        [new Date(2015, 0, 1, 0), 5],    [new Date(2015, 0, 1, 0, 30), 5.1], 
+        [new Date(2015, 0, 1, 1), 6.2],  [new Date(2015, 0, 1, 2), 7], 
+        [new Date(2015, 0, 1, 3), 6.4],  [new Date(2015, 0, 1, 4), 3], 
+        [new Date(2015, 0, 1, 5), 4],    [new Date(2015, 0, 1, 6), 4.2], 
+        [new Date(2015, 0, 1, 7), 1],    [new Date(2015, 0, 1, 8), 2.7], 
+        [new Date(2015, 0, 1, 9), 3.9],  [new Date(2015, 0, 1, 10), 3.8], 
+        [new Date(2015, 0, 1, 11), 5],   [new Date(2015, 0, 1, 12), 6.2], 
+        [new Date(2015, 0, 1, 13), 7.8], [new Date(2015, 0, 1, 14), 9.1], 
+        [new Date(2015, 0, 1, 15), 8],   [new Date(2015, 0, 1, 16), 6.8], 
+        [new Date(2015, 0, 1, 17), 7.2], [new Date(2015, 0, 1, 18), 4], 
+        [new Date(2015, 0, 1, 19), 5.9], [new Date(2015, 0, 1, 20), 6.3], 
+        [new Date(2015, 0, 1, 21), 6],   [new Date(2015, 0, 1, 22), 3], 
+        [new Date(2015, 0, 1, 23), 2.2], [new Date(2015, 0, 2, 0), 2.4], 
+        [new Date(2015, 0, 2, 1), 3.6],  [new Date(2015, 0, 2, 2), 4], 
+        [new Date(2015, 0, 2, 3), 5.5],  [new Date(2015, 0, 2, 4), 7.1], 
+        [new Date(2015, 0, 2, 5), 6],    [new Date(2015, 0, 2, 6), 7.8], 
+        [new Date(2015, 0, 2, 7), 8.2],  [new Date(2015, 0, 2, 8), 9], 
+      ]); 
+ 
+      var options = { 
+        /* 
+        width: 900, 
+        height: 500, 
+        legend: {position: 'none'},*/ 
+        chartArea: { 
+          width: '55%' 
+        }, 
+        enableInteractivity: true, 
+        vAxis: { 
+          title: 'Parts Per Million' 
+        }, 
+        hAxis: { 
+          /* viewWindow: { 
+            min: new Date(2014, 11, 31, 18), 
+            max: new Date(2015, 0, 3, 1) 
+          }, */ 
+          gridlines: { 
+            count: -1, 
+            units: { 
+              days: {format: ['MMM dd']}, 
+              hours: {format: ['HH:mm', 'ha']}, 
+            } 
+          }, 
+          minorGridlines: { 
+            units: { 
+              hours: {format: ['hh:mm:ss a', 'ha']}, 
+              minutes: {format: ['HH:mm a Z', ':mm']} 
+            } 
+          } 
+        } 
+      }; 
+ 
+      var chart = new google.visualization.LineChart( 
+        document.getElementById('chart_div')); 
+ 
+        theChart = chart; 
+ 
+      chart.draw(data, options); 
+ 
+      var button = document.getElementById('change'); 
+      var isChanged = false; 
+ 
+      button.onclick = function () { 
+ 
+        var now = new Date(); 
+ 
+        var startTime = new Date(now.toDateString()); 
+        startTime.setDate(startTime.getDate()-1); 
+ 
+        var endTime = now; 
+ 
+        console.log(&quot;value: &quot; + $( &quot;#endPicker&quot; ).val()); 
+ 
+        if($( &quot;#endPicker&quot; ).val() != &quot;pick a date&quot;){ 
+            endTime = new Date($( &quot;#endPicker&quot; ).val()); 
+        } 
+        if($( &quot;#startPicker&quot; ).val() != &quot;pick a date&quot;){ 
+            startTime = new Date($( &quot;#startPicker&quot; ).val()); 
+        } 
+ 
+        var url1 = &quot;http://34.213.144.139/readings?gasName=methane&amp;startDateTime=&quot;; 
+        var startDateStr = formatDate(startTime); 
+        var endDateStr = formatDate(endTime); 
+ 
+        var url = url1 + startDateStr + &quot;&amp;endDateTime=&quot; + endDateStr; 
+ 
+        console.log(&quot;url: &quot; + url); 
+ 
+        $.getJSON( url, function( dataReturned ) { 
+ 
+            var lastElem = dataReturned[dataReturned.length-1]; 
+ 
+            console.log(&quot;ajax request returned dataReturned size: &quot; + dataReturned.length); 
+ 
+ 
+ 
+                 data = new google.visualization.DataTable(); 
+                 data.addColumn('datetime', 'Time of Day'); 
+                 data.addColumn('number', 'Methane'); 
+ 
+                console.log('Last element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2)); 
+                chart.clearChart(); 
+ 
+                for( i = 0; i &lt; dataReturned.length; i++ ) { 
+ 
+                    //console.log(&quot;instant: &quot; + dataReturned[i].instant + &quot; reading: &quot; + dataReturned[i].reading); 
+ 
+                    data.addRows([ 
+                        [new Date(dataReturned[i].instant), dataReturned[i].reading] 
+                      ]); 
+ 
+                } 
+ 
+                chart.draw(data, options); 
+ 
+        }); 
+ 
+      }; 
+    } 
+</span><span class="s0">&lt;/</span><span class="s3">script</span><span class="s0">&gt;</span><span class="s2"> 
+</span><span class="s0">&lt;/</span><span class="s3">div</span><span class="s0">&gt;</span><span class="s2"> 
+ 
+ 
+ 
+ 
+</span><span class="s0">&lt;/</span><span class="s3">body</span><span class="s0">&gt;</span><span class="s2"> 
+</span><span class="s0">&lt;/</span><span class="s3">html</span><span class="s0">&gt;</span><span class="s2"> 
+</span></pre>
+</body>
+</html>
