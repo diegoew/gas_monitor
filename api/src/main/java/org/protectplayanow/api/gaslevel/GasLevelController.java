@@ -1,19 +1,12 @@
 package org.protectplayanow.api.gaslevel;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.protectplayanow.api.Greeting;
 import org.protectplayanow.api.config.RestApiConsts;
-import org.protectplayanow.api.gaslevel.repository.Device;
 import org.protectplayanow.api.gaslevel.view.rest.DeviceForRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -24,10 +17,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
-@Api(description = "These endpoints allow you stora and retrieve data.")
+@Api(description = "These endpoints allow you store and retrieve data.")
 @Slf4j
 public class GasLevelController {
 
@@ -44,7 +51,7 @@ public class GasLevelController {
     @Autowired
     GasLevelRepo gasLevelRepo;
 
-
+    @ApiOperation(value = "This endpoint allows you to set or get a global value. For instance the frequency.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
@@ -96,11 +103,12 @@ public class GasLevelController {
     }
 
 
+    @ApiOperation(value = "This endpoint allows you to get a list of unique deviceIds, sensorType, latidude, longitude.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/devices", method = RequestMethod.GET)
-    public ResponseEntity<List<DeviceForRest>> readingsRead(){
+    public ResponseEntity<List<DeviceForRest>> getDevices(){
 
         HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
 
@@ -115,7 +123,7 @@ public class GasLevelController {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/readings", method = RequestMethod.GET)
-    public ResponseEntity<List<Reading>> readingsRead(
+    public ResponseEntity<List<Reading>> getReadings(
 
             @ApiParam(value = RestApiConsts.apiGasMessage)
             @RequestParam(value = "gasName", defaultValue = RestApiConsts.all, required = false)
@@ -307,31 +315,4 @@ public class GasLevelController {
 
     }
 
-    @RequestMapping(value = "/exampleGetValue", method = RequestMethod.GET)
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World of Gas Monitoring") String name) {
-
-        jdbcTemplate.query(
-                "SELECT * from reading order by instance desc limit 5", new Object[] { 1 },
-                (rs, rowNum) -> Reading.builder()
-                        .instant(new Date(rs.getTimestamp("instant").getTime()))
-                        .deviceId(rs.getString("deviceId"))
-                        .gasName(rs.getString("gasName"))
-                        .reading(rs.getDouble("reading"))
-                        .unitOfReading(rs.getString("unitOfReading"))
-                        .latitude(rs.getDouble("latitude"))
-                        .longitude(rs.getDouble("longitude"))
-                        .build()
-        ).forEach(reading -> log.info(reading.toString()));
-
-        return new Greeting(counter.incrementAndGet(),
-                            String.format(template, name));
-
-    }
-
-    @RequestMapping(value="/examplePostValue", method = RequestMethod.POST)
-    public String add(@RequestBody Reading input) {
-
-        return String.format(template, "buddy");
-
-    }
 }
