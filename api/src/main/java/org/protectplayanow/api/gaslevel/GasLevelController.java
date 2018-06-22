@@ -13,6 +13,8 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.protectplayanow.api.Greeting;
 import org.protectplayanow.api.config.RestApiConsts;
+import org.protectplayanow.api.gaslevel.repository.Device;
+import org.protectplayanow.api.gaslevel.view.rest.DeviceForRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -88,6 +90,22 @@ public class GasLevelController {
                         "' request, the value for '" + key +
                         "' is '" + value + "' the previous value was '" + previousValue +
                         "'",
+                responseHeaders,
+                HttpStatus.OK);
+
+    }
+
+
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Well done!"),
+            @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
+    @RequestMapping(value = "/devices", method = RequestMethod.GET)
+    public ResponseEntity<List<DeviceForRest>> readingsRead(){
+
+        HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
+
+        return new ResponseEntity<List<DeviceForRest>>(
+                DeviceForRest.make(gasLevelRepo.getDevices()),
                 responseHeaders,
                 HttpStatus.OK);
 

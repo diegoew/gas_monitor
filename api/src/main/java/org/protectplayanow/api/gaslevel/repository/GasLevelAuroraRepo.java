@@ -54,6 +54,30 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
     }
 
     @Override
+    public List<Device> getDevices() {
+
+        List<Device> devices = new ArrayList<>();
+
+        jdbcTemplate.query(
+                "select distinct deviceId, sensorType, latitude, longitude from reading " +
+                        " order by deviceId asc",
+                new Object[] { },
+                (rs, rowNum) ->
+                        Device.builder()
+                        .deviceId(rs.getString("deviceId"))
+                        .sensorType(rs.getString("sensorType"))
+                        .latitude(rs.getDouble("latitude"))
+                        .longitude(rs.getDouble("longitude"))
+                        .build()
+        ).forEach(device -> {
+            log.debug(device.toString());
+            devices.add(device);
+        });
+
+        return devices;
+    }
+
+    @Override
     public void saveGasReadings(String deviceId, Date instant, double latitude, double longitude, List<ReadingForRestPOST> readings) {
 /*
 INSERT INTO reading

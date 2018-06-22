@@ -1,5 +1,7 @@
 package org.protectplayanow.api.gaslevel;
 
+import org.protectplayanow.api.gaslevel.repository.Device;
+
 import java.util.Date;
 import java.util.List;
 
@@ -13,5 +15,7 @@ public interface GasLevelRepo {
     void saveGasReadings(String deviceId, Date instant, double latitude, double longitude, List<ReadingForRestPOST> readings);
 
     void saveGasReadings(List<Reading> readings);
+
+    List<Device> getDevices();
 
 }
