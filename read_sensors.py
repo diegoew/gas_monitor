@@ -11,7 +11,7 @@ import time
 import requests
 import spidev
 
-from config import REPEAT_DELAY_SECONDS, BASE_URL, DEVICE_ID, LAT, LON, \
+from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
     SENSOR_TYPE_TO_PIN_NUM, SENSOR_TYPE_TO_LOAD_RESISTANCE, \
     SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO
 
@@ -78,7 +78,7 @@ def upload(sensor_type, reading, ro=None):
     )
     if ro is not None:
         data['ro'] = ro
-    response = requests.post(BASE_URL, data=data)
+    response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
 
 
