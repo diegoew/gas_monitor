@@ -12,7 +12,8 @@ import requests
 import spidev
 
 from config import REPEAT_DELAY_SECONDS, BASE_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPE_TO_PIN_NUM
+    SENSOR_TYPE_TO_PIN_NUM, SENSOR_TYPE_TO_LOAD_RESISTANCE, \
+    SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO
 
 
 parser = argparse.ArgumentParser(
@@ -56,7 +57,9 @@ def calibrate(sensor_type):
     if val == 0:
         val += 0.0000001
 
-    ro = (1023 / val - 1) * 5 / 9.48
+    lr = SENSOR_TYPE_TO_LOAD_RESISTANCE[sensor_type]
+    arr = SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO[sensor_type]
+    ro = (1023 / val - 1) * lr / arr
 
     print('Val:', val, 'Ro:', ro)
     logging.info('Ro=%g' % ro)
