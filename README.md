@@ -44,4 +44,8 @@ one type of gas. Therefore, readings might be skewed by other gases.
 
 [Components for the gas sensor device](https://docs.google.com/spreadsheets/d/18XvdZh5N7-iELkv8ZHe7yIzBQmGSkL3IdELiQ5KsU-c/edit?usp=sharing)
 
+https://www.gofundme.com/gas-monitor-project
 
+https://raspberry-gas-monitor.weebly.com/
+
+http://www.protectplayanow.org/
