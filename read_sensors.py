@@ -11,20 +11,15 @@ import time
 import requests
 import spidev
 
-from config import REPEAT_DELAY_SECONDS, BASE_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPE_TO_PIN_NUM
+from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
+    SENSOR_TYPE_TO_PIN_NUM, SENSOR_TYPE_TO_LOAD_RESISTANCE, \
+    SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO
 
 
 parser = argparse.ArgumentParser(
     description='Read gas sensors ' + ', '.join(SENSOR_TYPE_TO_PIN_NUM)
     + '\nTo configure, edit file config.py.'
 )
-parser.add_argument('-c', '--calibrate', action='store_true',
-                    help='Calibrate sensors before reading')
-parser.add_argument('-u', '--upload', action='store_true',
-                    help='Upload readings to configured Web site: ' + BASE_URL)
-
-
 spi = spidev.SpiDev()
 spi.open(0, 0)
 
@@ -62,17 +57,19 @@ def calibrate(sensor_type):
     if val == 0:
         val += 0.0000001
 
-    ro = (1023 / val - 1) * 5 / 9.48
+    lr = SENSOR_TYPE_TO_LOAD_RESISTANCE[sensor_type]
+    arr = SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO[sensor_type]
+    ro = (1023 / val - 1) * lr / arr
 
     print('Val:', val, 'Ro:', ro)
-    logging.info('Ro %g' % ro)
+    logging.info('Ro=%g' % ro)
 
     return ro
 
 
 def upload(sensor_type, reading, ro=None):
-    params = dict(
-        device_id=DEVICE_ID,
+    data = dict(
+        deviceId=DEVICE_ID,
         instant='now',
         latitude=LAT,
         longitude=LON,
@@ -80,28 +77,29 @@ def upload(sensor_type, reading, ro=None):
         reading=reading,
     )
     if ro is not None:
-        params['ro'] = ro
-    response = requests.get(BASE_URL, params=params)
+        data['ro'] = ro
+    response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
 
 
-def run(should_calibrate, should_upload):
+def run(should_calibrate=True):
     try:
         print('Press Ctrl+C to abort')
         logging.info('Program started')
 
-        ros = [calibrate(t) if should_calibrate else None
-               for t in SENSOR_TYPE_TO_PIN_NUM]
+        if should_calibrate:
+            ros = [calibrate(t) for t in SENSOR_TYPE_TO_PIN_NUM]
+        else:
+            ros = [None, None, None]
 
-        print('\n\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
+        print('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
             sys.stdout.write('\r\033[K')
             for sensor_type, ro in zip(SENSOR_TYPE_TO_PIN_NUM, ros):
                 val = read_adc(sensor_type)
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
-                if should_upload:
-                    upload(val, ro)
+                upload(sensor_type, val, ro)
                 time.sleep(REPEAT_DELAY_SECONDS)
 
     except KeyboardInterrupt:
@@ -111,4 +109,4 @@ def run(should_calibrate, should_upload):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    run(args.calibrate, args.upload)
+    run()
