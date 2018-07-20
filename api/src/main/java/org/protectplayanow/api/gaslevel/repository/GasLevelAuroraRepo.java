@@ -47,6 +47,10 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
                         .latitude(rs.getDouble("latitude"))
                         .longitude(rs.getDouble("longitude"))
                         .sensorType(rs.getString("sensorType"))
+                        .input(rs.getDouble("input"))
+                        .relativeHumidity(rs.getDouble("relHumidity"))
+                        .tempInCelsius(rs.getDouble("tempInCelsius"))
+                        .ro(rs.getDouble("ro"))
                         .build()
         ).forEach(reading -> {
             //log.debug(reading.toString());

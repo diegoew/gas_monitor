@@ -24,10 +24,11 @@ public class Reading {
 
     private double latitude, longitude, reading, tempInCelsius, relativeHumidity, input;
 
-    @JsonIgnore
     private double ro;
 
     private static final double RL_MQ2 = 5;
+    private static final double RL_MQ9 = 18;
+    private static final double RL_MQ135 = 20;
 
     public List<Reading> makeReadingsWithCalculation(){
 
@@ -45,7 +46,7 @@ public class Reading {
 
         switch (this.sensorType) {
             case RestApiConsts.mq2 :
-                loadResistance = 5d;
+                loadResistance = RL_MQ2;
                 ro = this.getRo() == 0 ? 6 : this.getRo();
                 calcMap.put(RestApiConsts.h2, new CalcConsts(957.82, -2.108));
                 calcMap.put(RestApiConsts.lpg, new CalcConsts(569.12, -2.124));
@@ -57,7 +58,7 @@ public class Reading {
                 break;
 
             case RestApiConsts.mq9 :
-                loadResistance = 18d;
+                loadResistance = RL_MQ9;
                 ro = this.getRo() == 0 ? 50 : this.getRo();
                 calcMap.put(RestApiConsts.lpg, new CalcConsts(972.52, -2.133));
                 calcMap.put(RestApiConsts.co, new CalcConsts(579.05, -2.247));
@@ -65,7 +66,7 @@ public class Reading {
                 break;
 
             case RestApiConsts.mq135 :
-                loadResistance = 20d;
+                loadResistance = RL_MQ135;
                 ro = this.getRo() == 0 ? 80 : this.getRo();
                 calcMap.put(RestApiConsts.co2, new CalcConsts(111.87, -2.893));
                 calcMap.put(RestApiConsts.co, new CalcConsts(573.78, -3.924));
@@ -76,15 +77,9 @@ public class Reading {
                 break;
         }
 
-        log.trace("loadResistance: {}", loadResistance);
-
-        double rs = ((1023/input)-1) * loadResistance;
-
-        log.trace("rs: {}", rs);
-
         double roFromDefaultOrRecievedValue = ro;
 
-        double rs_over_ro = ((((1023/input)-1)*RL_MQ2)/roFromDefaultOrRecievedValue)
+        double rs_over_ro = ((((1023/input)-1)*loadResistance)/roFromDefaultOrRecievedValue)
                             /
                             ((.00007*(this.relativeHumidity*100)-.0158)*this.tempInCelsius + (-(.0074*this.relativeHumidity*100) + 1.7761));
 

@@ -166,55 +166,6 @@ public class GasLevelController {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 400, message = "You are not sending in the proper request. See 'warning' header for info, Buster!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
-    @RequestMapping(value = "/readings", method = RequestMethod.POST)
-    public ResponseEntity<Void> readingsWrite(
-
-            @ApiParam(value = "deviceId")
-            @RequestParam(value = "deviceId", defaultValue = RestApiConsts.PleaseSendDeviceIdNextTime, required = false)
-                    String deviceId,
-
-            @ApiParam(value = RestApiConsts.apiInstantDateMessage)
-            @RequestParam(value = "instant", defaultValue = RestApiConsts.now, required = false)
-            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
-                    Date instant,
-
-            @ApiParam(value = RestApiConsts.latitudePdr)
-            @RequestParam(value = "latitude", defaultValue = RestApiConsts.latitudePdr, required = false)
-                    double latitude,
-
-            @ApiParam(value = RestApiConsts.longitudePdr)
-            @RequestParam(value = "longitude", defaultValue = RestApiConsts.longitudePdr, required = false)
-                    double longitude,
-
-            @RequestBody(required = true) List<ReadingForRestPOST> readings
-
-    ) {
-
-        if(readings == null){
-            MultiValueMap<String, String> headers = new HttpHeaders();
-            headers.set(HttpHeaders.WARNING, "You sent in null for the readings parameter.");
-            ResponseEntity re = new ResponseEntity<Void>(headers, HttpStatus.BAD_REQUEST);
-            return re;
-        } else if(readings.isEmpty()){
-            MultiValueMap<String, String> headers = new HttpHeaders();
-            headers.set(HttpHeaders.WARNING, "You sent in an empty list for the readings parameter.");
-            ResponseEntity re = new ResponseEntity<Void>(headers, HttpStatus.BAD_REQUEST);
-            return re;
-        }
-
-        log.info("deviceId={}, instant={}, latitude={}, longitude={}", deviceId, instant, latitude, longitude);
-
-        gasLevelRepo.saveGasReadings(deviceId, instant, latitude, longitude, readings);
-
-        return new ResponseEntity<Void>(
-                RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency)),
-                HttpStatus.OK);
-
-    }
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Well done!"),
-            @ApiResponse(code = 400, message = "You are not sending in the proper request. See 'warning' header for info, Buster!"),
-            @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/readings/calculate", method = RequestMethod.POST)
     public ResponseEntity<Void> readingsWriteAfterCalculation(
 
