@@ -22,10 +22,12 @@ public class Reading {
 
     private String deviceId, gasName, unitOfReading, sensorType;
 
-    private double latitude, longitude, reading;
+    private double latitude, longitude, reading, tempInCelsius, relativeHumidity, input;
 
     @JsonIgnore
     private double ro;
+
+    private static final double RL_MQ2 = 5;
 
     public List<Reading> makeReadingsWithCalculation(){
 
@@ -80,9 +82,14 @@ public class Reading {
 
         log.trace("rs: {}", rs);
 
-        double rs_over_ro = rs/ro;
+        double roFromDefaultOrRecievedValue = ro;
+
+        double rs_over_ro = ((((1023/input)-1)*RL_MQ2)/roFromDefaultOrRecievedValue)
+                            /
+                            ((.00007*(this.relativeHumidity*100)-.0158)*this.tempInCelsius + (-(.0074*this.relativeHumidity*100) + 1.7761));
 
 
+        log.trace("roFromDefaultOrRecievedValue: {}", roFromDefaultOrRecievedValue);
         log.trace("rs_over_ro: {}", rs_over_ro);
 
         calcMap.forEach((key, calc) -> {
@@ -96,21 +103,23 @@ public class Reading {
                     .instant(this.instant)
                     .latitude(this.latitude)
                     .longitude(this.longitude)
+                    .relativeHumidity(this.relativeHumidity)
+                    .tempInCelsius(this.tempInCelsius)
+                    .ro(roFromDefaultOrRecievedValue)
+                    .input(input)
                     .unitOfReading("ppm")
                     .reading(
                             calc.c1 * (Math.pow((rs_over_ro), calc.c2))
                     )
                     .build()
+
             );
 
-            log.debug("reading: {}", readings.get(readings.size()-1).reading);
+            log.trace("reading: {}, gasName: {} ", readings.get(readings.size()-1).reading, readings.get(readings.size()-1).gasName);
         });
 
         return readings;
     }
-
-
-    //public Reading() { }
 
 }
 

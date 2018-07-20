@@ -245,11 +245,19 @@ public class GasLevelController {
 
             @ApiParam(value = "this value is determined by calibrating the sensor, if you don't know it we'll use defaults")
             @RequestParam(value = "ro", defaultValue = "0", required = false)
-                    double ro
+                    double ro,
+
+            @ApiParam(value = "this value needs to be sent by the pi, if you don't know it we'll use defaults")
+            @RequestParam(value = "tempInCelsius", defaultValue = "20", required = false)
+                    double tempInCelsius,
+
+            @ApiParam(value = "this value needs to be sent by the pi, if you don't know it we'll use defaults")
+            @RequestParam(value = "relativeHumidity", defaultValue = ".10", required = false)
+                    double relativeHumidity
 
     ) {
 
-        log.info("deviceId={}, instant={}, latitude={}, longitude={}", deviceId, instant, latitude, longitude);
+        log.info("deviceId={}, instant={}, latitude={}, longitude={}, sensorTypeMsg={}", deviceId, instant, latitude, longitude, sensorType);
 
         Reading r = Reading.builder()
                 .deviceId(deviceId)
@@ -257,8 +265,11 @@ public class GasLevelController {
                 .latitude(latitude)
                 .longitude(longitude)
                 .reading(reading)
+                .input(reading)
                 .sensorType(sensorType)
                 .ro(ro)
+                .tempInCelsius(tempInCelsius)
+                .relativeHumidity(relativeHumidity)
                 .build();
 
         gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
