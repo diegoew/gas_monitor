@@ -4,6 +4,7 @@ Script to periodically read gas concentration measurements from sensors and
 optionally upload them to a Web service.
 """
 import argparse
+from datetime import datetime, timezone
 import logging
 import sys
 import time
@@ -70,7 +71,7 @@ def calibrate(sensor_type):
 def upload(sensor_type, reading, ro=None):
     data = dict(
         deviceId=DEVICE_ID,
-        instant='now',
+        instant=datetime.now(timezone.utc).astimezone().isoformat(),
         latitude=LAT,
         longitude=LON,
         sensorType=sensor_type,
