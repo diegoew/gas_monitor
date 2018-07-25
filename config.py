@@ -12,7 +12,11 @@ SENSOR_TYPE_TO_LOAD_RESISTANCE = {
 SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO = {
     'MQ-2': 9.48, 'MQ-9': 9.71, 'MQ-135': 3.59
 }
-
+DB_HOST = 'localhost'
+DB_USER = 'gas_recorder'
+DB_PASSWORD = 'strawberry'
+DB = 'gas_measurements'
+DB_TABLE = 'measurements'
 
 import logging
 logging.basicConfig(filename="gas_readings.log",
