@@ -85,15 +85,15 @@ def calibrate(sensor_type):
     return ro
 
 
-def timestamp():
-    td_str = datetime.now(timezone.utc).astimezone().strftime(DATETIME_FORMAT)
+def timestamp(dt):
+    td_str = dt.strftime(DATETIME_FORMAT)
     return td_str[:-2] + ':' + td_str[-2:]
 
 
-def upload(sensor_type, reading, ro=None, ts=None):
+def upload(dt, sensor_type, reading, ro=None):
     data = dict(
         deviceId=DEVICE_ID,
-        instant=ts or timestamp(),
+        instant=timestamp(dt),
         latitude=LAT,
         longitude=LON,
         sensorType=sensor_type,
@@ -105,15 +105,16 @@ def upload(sensor_type, reading, ro=None, ts=None):
     response.raise_for_status()
 
 
-def record(sensor_type, reading, ro, error_str):
+def record(ts, sensor_type, reading, ro, error_str='', upload_ts=None):
     with get_db_connection().cursor() as cursor:
         try:
             cursor.execute(
-                'INSERT INTO %s(ts, sensor, reading, ro, upload_error)' % DB_TABLE
-                + ' VALUES (%s, %s, %s, %s, %s);',
-                (datetime.now(), sensor_type, reading, ro, error_str[:100]))
+                'INSERT INTO %s' % DB_TABLE
+                + '(ts, sensor, reading, ro, upload_ts, upload_error)' 
+                + ' VALUES (%s, %s, %s, %s, %s, %s);',
+                (ts, sensor_type, reading, ro, upload_ts, error_str[:100]))
         except Exception as e:
-            logging.error('Failed to record reading into DB:' , e)
+            logging.error('Failed to record measurement into DB:', e)
 
 
 def upload_recorded():
@@ -127,21 +128,22 @@ def upload_recorded():
             logging.error('Failed to get recorded measurements')
             return
 
-        # Upload and record the upload timestamp for each measurement
-        for id_, ts, sensor, reading, ro, _, _ in cursor.fetchall():
+        # Upload each measurement and record its upload timestamp
+        for id_, dt, sensor, reading, ro, _, _ in cursor.fetchall():
             try:
-                upload(sensor, reading, ro, ts=ts)
+                upload(dt, sensor, reading, ro)
             except Exception as e:
-                logging.error('Failed to upload recorded measurement %s: %s' %
+                logging.error('Failed to upload recorded measurement %s: %s',
                               (id_, e))
                 continue
+
             try:
                 cursor.execute('UPDATE %s' % DB_TABLE
                                + ' SET upload_ts = %s WHERE id = %s;', 
                                (datetime.now(), id_))
             except Exception as e:
                 logging.error('Failed to record the upload timestamp for'
-                              ' meaurement %s: %s' % (id_, e))
+                              ' measurement %s: %s', (id_, e))
                 break
 
 
@@ -162,20 +164,19 @@ def run(should_calibrate=True):
             sys.stdout.write('\r\033[K')
             for sensor_type, ro in zip(SENSOR_TYPE_TO_PIN_NUM, ros):
                 val = read_adc(sensor_type)
+                dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
 
                 try:
-                    upload(sensor_type, val, ro)
-                except requests.exceptions.ConnectionError as e:
-                    record(cursor, sensor_type, val, ro,
-                           'Could not connect to ' + SERVER_URL)
+                    upload(dt, sensor_type, val, ro)
+                    record(dt, sensor_type, val, ro, '', datetime.now())
+                except requests.exceptions.ConnectionError:
+                    err_str = 'Could not connect to ' + SERVER_URL
+                    record(dt, sensor_type, val, ro, err_str)
                 except requests.exceptions.HTTPError as e:
-                    if hasatr(e, 'args') and len(e.args) > 0:
-                        err_str = e.args[0]
-                    else:
-                        err_str = str(e)
-                    record(cursor, sensor_type, val, ro, err_str)
+                    record(dt, sensor_type, val, ro, str(e))
+
                 time.sleep(REPEAT_DELAY_SECONDS)
 
     except KeyboardInterrupt:
