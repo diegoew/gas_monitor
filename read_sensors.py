@@ -105,14 +105,14 @@ def upload(dt, sensor_type, reading, ro=None):
     response.raise_for_status()
 
 
-def record(ts, sensor_type, reading, ro, error_str='', upload_ts=None):
+def record(ts, sensor_type, reading, ro, upload_ts=None):
     with get_db_connection().cursor() as cursor:
         try:
             cursor.execute(
                 'INSERT INTO %s' % DB_TABLE
-                + '(ts, sensor, reading, ro, upload_ts, upload_error)' 
-                + ' VALUES (%s, %s, %s, %s, %s, %s);',
-                (ts, sensor_type, reading, ro, upload_ts, error_str[:100]))
+                + '(ts, sensor, reading, ro, upload_ts)'
+                + ' VALUES (%s, %s, %s, %s, %s);',
+                (ts, sensor_type, reading, ro, upload_ts))
         except Exception as e:
             logging.error('Failed to record measurement into DB:', e)
 
@@ -121,21 +121,19 @@ def upload_recorded():
     with get_db_connection().cursor() as cursor:
         # Get all recorded measurements that were not uploaded
         try:
-            cursor.execute(
-                'SELECT * FROM %s WHERE upload_ts IS NULL' % DB_TABLE
-                + ' ORDER BY ts ASC;')
+            cursor.execute('SELECT * FROM %s' % DB_TABLE
+                           + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
         except Exception as e:
             logging.error('Failed to get recorded measurements')
             return
 
         # Upload each measurement and record its upload timestamp
-        for id_, dt, sensor, reading, ro, _, _ in cursor.fetchall():
+        for id_, dt, sensor_type, reading, ro, _ in cursor.fetchall():
             try:
-                upload(dt, sensor, reading, ro)
+                upload(dt, sensor_type, reading, ro)
             except Exception as e:
-                logging.error('Failed to upload recorded measurement %s: %s',
-                              (id_, e))
-                continue
+                logging.error('Failed to upload measurement %s: %s', (id_, e))
+                break
 
             try:
                 cursor.execute('UPDATE %s' % DB_TABLE
@@ -159,23 +157,14 @@ def run(should_calibrate=True):
 
         print('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
-            upload_recorded()
-
             sys.stdout.write('\r\033[K')
             for sensor_type, ro in zip(SENSOR_TYPE_TO_PIN_NUM, ros):
                 val = read_adc(sensor_type)
                 dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
-
-                try:
-                    upload(dt, sensor_type, val, ro)
-                    record(dt, sensor_type, val, ro, '', datetime.now())
-                except requests.exceptions.ConnectionError:
-                    err_str = 'Could not connect to ' + SERVER_URL
-                    record(dt, sensor_type, val, ro, err_str)
-                except requests.exceptions.HTTPError as e:
-                    record(dt, sensor_type, val, ro, str(e))
+                record(dt, sensor_type, val, ro)
+                upload_recorded()
 
                 time.sleep(REPEAT_DELAY_SECONDS)
 

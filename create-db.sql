@@ -9,6 +9,5 @@ CREATE TABLE measurements(
     sensor VARCHAR(8),
     reading FLOAT,
     ro FLOAT NULL,
-    upload_ts TIMESTAMP NULL,
-    upload_error VARCHAR(100)
+    upload_ts TIMESTAMP NULL
 );
