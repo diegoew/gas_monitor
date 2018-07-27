@@ -24,7 +24,6 @@ parser = argparse.ArgumentParser(
     + '\nTo configure, edit file config.py.'
 )
 spi = spidev.SpiDev()
-spi.open(0, 0)
 
 
 def read_adc(sensor_type):
@@ -90,15 +89,14 @@ def upload(sensor_type, reading, ro=None):
     response.raise_for_status()
 
 
-def run(should_calibrate=True):
+def run():
+    spi.open(0, 0)
+
     try:
         print('Press Ctrl+C to abort')
         logging.info('Program started')
 
-        if should_calibrate:
-            ros = [calibrate(t) for t in SENSOR_TYPE_TO_PIN_NUM]
-        else:
-            ros = [None, None, None]
+        ros = [calibrate(t) for t in SENSOR_TYPE_TO_PIN_NUM]
 
         print('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
