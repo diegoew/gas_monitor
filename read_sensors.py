@@ -30,8 +30,7 @@ def read_adc(pin_num):
     :return SPI data from the MCP3008 analogue-to-digital converter (ADC),
     from 8 channels in total.
     """
-    if not 0 <= pin_num <= 7:
-        return -1
+    assert 0 <= pin_num < len(SENSOR_TYPES), 'Invalid pin number: %s' % pin_num
     r = spi.xfer2([1, 8 + pin_num << 4, 0])
     return ((r[1] & 3) << 8) + r[2]
 
