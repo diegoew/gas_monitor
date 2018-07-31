@@ -6,7 +6,11 @@ REPEAT_DELAY_SECONDS = 60
 SENSOR_TYPES = ['MQ-2', 'MQ-9', 'MQ-135']
 LOAD_RESISTANCES = [5, 18, 20]
 AIR_RESISTANCE_RATIOS = [9.48, 9.71, 3.59]
-
+DB_HOST = 'localhost'
+DB_USER = 'gas_recorder'
+DB_PASSWORD = 'strawberry'
+DB = 'gas_measurements'
+DB_TABLE = 'measurements'
 
 import logging
 logging.basicConfig(filename="gas_readings.log",

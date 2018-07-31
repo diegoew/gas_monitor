@@ -9,12 +9,13 @@ import logging
 import sys
 import time
 
+import pymysql
 import requests
 import spidev
 
 from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPES, LOAD_RESISTANCES, AIR_RESISTANCE_RATIOS
-
+    SENSOR_TYPES, LOAD_RESISTANCES, AIR_RESISTANCE_RATIOS \
+    DB_HOST, DB_USER, DB_PASSWORD, DB, DB_TABLE
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
@@ -22,7 +23,20 @@ parser = argparse.ArgumentParser(
     description='Read gas sensors ' + ', '.join(SENSOR_TYPES)
     + '\nTo configure, edit file config.py.'
 )
+
+db_connection = None
 spi = spidev.SpiDev()
+
+
+def get_db_connection():
+    global db_connection
+    if not db_connection or not db_connection.open:
+        db_connection = pymysql.connect(host=DB_HOST,
+                                        user=DB_USER,
+                                        password=DB_PASSWORD,
+                                        db=DB,
+                                        autocommit=True)
+    return db_connection
 
 
 def read_adc(pin_num):
@@ -67,15 +81,15 @@ def calibrate(pin_num):
     return ro
 
 
-def timestamp():
-    td_str = datetime.now(timezone.utc).astimezone().strftime(DATETIME_FORMAT)
+def timestamp(dt):
+    td_str = dt.strftime(DATETIME_FORMAT)
     return td_str[:-2] + ':' + td_str[-2:]
 
 
-def upload(sensor_type, reading, ro=None):
+def upload(dt, sensor_type, reading, ro=None):
     data = dict(
         deviceId=DEVICE_ID,
-        instant=timestamp(),
+        instant=timestamp(dt),
         latitude=LAT,
         longitude=LON,
         sensorType=sensor_type,
@@ -85,6 +99,46 @@ def upload(sensor_type, reading, ro=None):
         data['ro'] = ro
     response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
+
+
+def record(ts, sensor_type, reading, ro, upload_ts=None):
+    with get_db_connection().cursor() as cursor:
+        try:
+            cursor.execute(
+                'INSERT INTO %s' % DB_TABLE
+                + '(ts, sensor, reading, ro, upload_ts)'
+                + ' VALUES (%s, %s, %s, %s, %s);',
+                (ts, sensor_type, reading, ro, upload_ts))
+        except Exception as e:
+            logging.error('Failed to record measurement into DB:', e)
+
+
+def upload_recorded():
+    with get_db_connection().cursor() as cursor:
+        # Get all recorded measurements that were not uploaded
+        try:
+            cursor.execute('SELECT * FROM %s' % DB_TABLE
+                           + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
+        except Exception as e:
+            logging.error('Failed to get recorded measurements')
+            return
+
+        # Upload each measurement and record its upload timestamp
+        for id_, dt, sensor_type, reading, ro, _ in cursor.fetchall():
+            try:
+                upload(dt, sensor_type, reading, ro)
+            except Exception as e:
+                logging.error('Failed to upload measurement %s: %s', (id_, e))
+                break
+
+            try:
+                cursor.execute('UPDATE %s' % DB_TABLE
+                               + ' SET upload_ts = %s WHERE id = %s;', 
+                               (datetime.now(), id_))
+            except Exception as e:
+                logging.error('Failed to record the upload timestamp for'
+                              ' measurement %s: %s', (id_, e))
+                break
 
 
 def run():
@@ -101,14 +155,21 @@ def run():
             sys.stdout.write('\r\033[K')
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
                 val = read_adc(pin_num)
+                dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
-                upload(sensor_type, val, ro)
+                record(dt, sensor_type, val, ro)
+                upload_recorded()
                 time.sleep(REPEAT_DELAY_SECONDS)
 
     except KeyboardInterrupt:
         print('\nAbort by user')
         logging.info('Abort by user')
+        if db_connection:
+            try:
+                db_connection.close()
+            except:
+                pass
 
 
 if __name__ == '__main__':
