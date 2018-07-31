@@ -14,21 +14,18 @@ import requests
 import spidev
 
 from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPE_TO_PIN_NUM, SENSOR_TYPE_TO_LOAD_RESISTANCE, \
-    SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO, DB_HOST, DB_USER, DB_PASSWORD, DB, \
-    DB_TABLE
-
+    SENSOR_TYPES, LOAD_RESISTANCES, AIR_RESISTANCE_RATIOS \
+    DB_HOST, DB_USER, DB_PASSWORD, DB, DB_TABLE
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
 parser = argparse.ArgumentParser(
-    description='Read gas sensors ' + ', '.join(SENSOR_TYPE_TO_PIN_NUM)
+    description='Read gas sensors ' + ', '.join(SENSOR_TYPES)
     + '\nTo configure, edit file config.py.'
 )
 
 db_connection = None
 spi = spidev.SpiDev()
-spi.open(0, 0)
 
 
 def get_db_connection():
@@ -42,19 +39,17 @@ def get_db_connection():
     return db_connection
 
 
-def read_adc(sensor_type):
+def read_adc(pin_num):
     """
     :return SPI data from the MCP3008 analogue-to-digital converter (ADC),
     from 8 channels in total.
     """
-    adc_num = SENSOR_TYPE_TO_PIN_NUM[sensor_type]
-    if not 0 <= adc_num <= 7:
-        return -1
-    r = spi.xfer2([1, 8 + adc_num << 4, 0])
+    assert 0 <= pin_num < len(SENSOR_TYPES), 'Invalid pin number: %s' % pin_num
+    r = spi.xfer2([1, 8 + pin_num << 4, 0])
     return ((r[1] & 3) << 8) + r[2]
 
 
-def calibrate(sensor_type):
+def calibrate(pin_num):
     """Calibrate sensor.
     :return Ro, the calculated sensor resistance for the given sensor type
 
@@ -64,19 +59,20 @@ def calibrate(sensor_type):
     the resistance at various concentrations of gases, and the ratio Rs/Ro which
     is almost constant for pure air and is given by the manufacturer.
     """
+    sensor_type = SENSOR_TYPES[pin_num]
     print('Calibrate ' + sensor_type)
     logging.info('Calibrate ' + sensor_type)
 
     val = 0.0
     for _ in range(50):
-        val += read_adc(sensor_type)
+        val += read_adc(pin_num)
     val /= 50
 
     if val == 0:
         val += 0.0000001
 
-    lr = SENSOR_TYPE_TO_LOAD_RESISTANCE[sensor_type]
-    arr = SENSOR_TYPE_TO_AIR_RESISTANCE_RATIO[sensor_type]
+    lr = LOAD_RESISTANCES[pin_num]
+    arr = AIR_RESISTANCE_RATIOS[pin_num]
     ro = (1023 / val - 1) * lr / arr
 
     print('Val:', val, 'Ro:', ro)
@@ -145,27 +141,25 @@ def upload_recorded():
                 break
 
 
-def run(should_calibrate=True):
+def run():
+    spi.open(0, 0)
+
     try:
         print('Press Ctrl+C to abort')
         logging.info('Program started')
 
-        if should_calibrate:
-            ros = [calibrate(t) for t in SENSOR_TYPE_TO_PIN_NUM]
-        else:
-            ros = [None, None, None]
+        ros = [calibrate(i) for i in range(len(SENSOR_TYPES))]
 
         print('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
             sys.stdout.write('\r\033[K')
-            for sensor_type, ro in zip(SENSOR_TYPE_TO_PIN_NUM, ros):
-                val = read_adc(sensor_type)
+            for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
+                val = read_adc(pin_num)
                 dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
                 record(dt, sensor_type, val, ro)
                 upload_recorded()
-
                 time.sleep(REPEAT_DELAY_SECONDS)
 
     except KeyboardInterrupt:
