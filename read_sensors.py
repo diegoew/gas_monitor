@@ -9,11 +9,11 @@ import logging
 import sys
 import time
 
-import pymysql
 import requests
 
 from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPES, DB_HOST, DB_USER, DB_PASSWORD, DB, DB_TABLE
+    SENSOR_TYPES
+import db
 import openweather
 import sensor
 
@@ -24,19 +24,6 @@ parser = argparse.ArgumentParser(
     description='Read gas sensors ' + ', '.join(SENSOR_TYPES)
     + '\nTo configure, edit file config.py.'
 )
-
-db_connection = None
-
-
-def get_db_connection():
-    global db_connection
-    if not db_connection or not db_connection.open:
-        db_connection = pymysql.connect(host=DB_HOST,
-                                        user=DB_USER,
-                                        password=DB_PASSWORD,
-                                        db=DB,
-                                        autocommit=True)
-    return db_connection
 
 
 def timestamp(dt):
@@ -64,33 +51,11 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
     response.raise_for_status()
 
 
-def record(ts, sensor_type, reading, ro, temperature=None, rel_humidity=None,
-           upload_ts=None):
-    with get_db_connection().cursor() as cursor:
-        try:
-            cursor.execute(
-                'INSERT INTO %s' % DB_TABLE
-                + '(ts, sensor, reading, ro, upload_ts)'
-                + ' VALUES (%s, %s, %s, %s, %s, %s, %s);',
-                (ts, sensor_type, reading, ro, temperature, rel_humidity,
-                 upload_ts))
-        except Exception as e:
-            logging.error('Failed to record measurement into DB:', e)
-
-
 def upload_recorded():
-    with get_db_connection().cursor() as cursor:
-        # Get all recorded measurements that were not uploaded
-        try:
-            cursor.execute('SELECT * FROM %s' % DB_TABLE
-                           + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
-        except Exception as e:
-            logging.error('Failed to get recorded measurements')
-            return
-
+        not_uploaded = db.get_not_uploaded()
         # Upload each measurement and record its upload timestamp
         for id_, dt, sensor_type, reading, ro, temperature, rel_humidity, _ \
-                in cursor.fetchall():
+                in not_uploaded:
             try:
                 upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
@@ -98,9 +63,7 @@ def upload_recorded():
                 break
 
             try:
-                cursor.execute('UPDATE %s' % DB_TABLE
-                               + ' SET upload_ts = %s WHERE id = %s;', 
-                               (datetime.now(), id_))
+                db.record_uploaded_time()
             except Exception as e:
                 logging.error('Failed to record the upload timestamp for'
                               ' measurement %s: %s', (id_, e))
@@ -125,19 +88,14 @@ def run():
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
-                record(dt, sensor_type, val, ro, temp, hum)
+                db.record(dt, sensor_type, val, ro, temp, hum)
                 upload_recorded()
                 time.sleep(REPEAT_DELAY_SECONDS)
 
     except KeyboardInterrupt:
         print('\nAbort by user')
         logging.info('Abort by user')
-        if db_connection:
-            try:
-                db_connection.close()
-            except:
-                pass
-
+        db.close_connection()
 
 if __name__ == '__main__':
     args = parser.parse_args()
