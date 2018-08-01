@@ -9,5 +9,7 @@ CREATE TABLE measurements(
     sensor VARCHAR(8),
     reading FLOAT,
     ro FLOAT NULL,
+    temperature FLOAT NULL,
+    rel_humidity FLOAT NULL,
     upload_ts TIMESTAMP NULL
 );

@@ -16,6 +16,8 @@ import spidev
 from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
     SENSOR_TYPES, LOAD_RESISTANCES, AIR_RESISTANCE_RATIOS, \
     DB_HOST, DB_USER, DB_PASSWORD, DB, DB_TABLE
+import openweather
+
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
@@ -86,7 +88,8 @@ def timestamp(dt):
     return td_str[:-2] + ':' + td_str[-2:]
 
 
-def upload(dt, sensor_type, reading, ro=None):
+def upload(dt, sensor_type, reading, ro=None, temperature=None,
+           rel_humidity=None):
     data = dict(
         deviceId=DEVICE_ID,
         instant=timestamp(dt),
@@ -97,18 +100,24 @@ def upload(dt, sensor_type, reading, ro=None):
     )
     if ro is not None:
         data['ro'] = ro
+    if temperature is not None:
+        data['temperature'] = temperature
+    if rel_humidity is not None:
+        data['rel_humidity'] = rel_humidity
     response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
 
 
-def record(ts, sensor_type, reading, ro, upload_ts=None):
+def record(ts, sensor_type, reading, ro, temperature=None, rel_humidity=None,
+           upload_ts=None):
     with get_db_connection().cursor() as cursor:
         try:
             cursor.execute(
                 'INSERT INTO %s' % DB_TABLE
                 + '(ts, sensor, reading, ro, upload_ts)'
-                + ' VALUES (%s, %s, %s, %s, %s);',
-                (ts, sensor_type, reading, ro, upload_ts))
+                + ' VALUES (%s, %s, %s, %s, %s, %s, %s);',
+                (ts, sensor_type, reading, ro, temperature, rel_humidity,
+                 upload_ts))
         except Exception as e:
             logging.error('Failed to record measurement into DB:', e)
 
@@ -124,9 +133,10 @@ def upload_recorded():
             return
 
         # Upload each measurement and record its upload timestamp
-        for id_, dt, sensor_type, reading, ro, _ in cursor.fetchall():
+        for id_, dt, sensor_type, reading, ro, temperature, rel_humidity, _ \
+                in cursor.fetchall():
             try:
-                upload(dt, sensor_type, reading, ro)
+                upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
                 logging.error('Failed to upload measurement %s: %s', (id_, e))
                 break
@@ -158,7 +168,8 @@ def run():
                 dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
-                record(dt, sensor_type, val, ro)
+                temp, hum = openweather.get_temperature_and_rel_humidity()
+                record(dt, sensor_type, val, ro, temp, hum)
                 upload_recorded()
                 time.sleep(REPEAT_DELAY_SECONDS)
 
