@@ -21,7 +21,7 @@ def _set_openweather():
                   mode='json')
     parsed = requests.get(WEATHER_URL, params=params).json()['main']
     temperature = parsed['temp']
-    rel_humidity = parsed['humidity']/100
+    rel_humidity = parsed['humidity']/100.0
     timeout = time.time() + WEATHER_RETRIEVAL_INTERVAL_SECONDS
 
 
