@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Script to periodically read gas concentration measurements from sensors and
-optionally upload them to a Web service.
+Script to periodically read gas concentration measurements from sensors,
+record them to a local database and upload them to a Web service.
 """
 import argparse
 from datetime import datetime, timezone
