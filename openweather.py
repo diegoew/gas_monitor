@@ -1,4 +1,5 @@
 import time
+import logging
 
 import requests
 
@@ -6,7 +7,7 @@ from config import WEATHER_URL, OPENWEATHER_KEY, LAT, LON, \
     WEATHER_RETRIEVAL_INTERVAL_SECONDS
 
 
-UNIT = 'metric' # Possible values: kelvin, imperial, metric. Default is kelvin
+UNIT_TYPE = 'metric'  # imperial, metric or kelvin (default)
 temperature = None
 rel_humidity = None
 timeout = 0
@@ -16,12 +17,18 @@ def _set_openweather():
     global temperature, rel_humidity, timeout
     params = dict(lat=LAT,
                   lon=LON,
-                  apiid=OPENWEATHER_KEY,
-                  units=UNIT,
+                  appid=OPENWEATHER_KEY,
+                  units=UNIT_TYPE,
                   mode='json')
-    parsed = requests.get(WEATHER_URL, params=params).json()['main']
+    try:
+        response = requests.get(WEATHER_URL, params=params)
+        response.raise_for_status()
+        parsed = response.json()['main']
+    except Exception as e:
+        logging.error('Failed to get weather:', e)
+        return
     temperature = parsed['temp']
-    rel_humidity = parsed['humidity']/100.0
+    rel_humidity = parsed['humidity'] / 100.0
     timeout = time.time() + WEATHER_RETRIEVAL_INTERVAL_SECONDS
 
 
