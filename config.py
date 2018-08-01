@@ -11,6 +11,10 @@ DB_USER = 'gas_recorder'
 DB_PASSWORD = 'strawberry'
 DB = 'gas_measurements'
 DB_TABLE = 'measurements'
+WEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather?'
+# Unique key per Gas Monitor, can be used up to 60 times per minute
+OPENWEATHER_KEY = '177f943c86860b2efb332b00962ac509'
+WEATHER_RETRIEVAL_INTERVAL_SECONDS = 60
 
 import logging
 logging.basicConfig(filename="gas_readings.log",
