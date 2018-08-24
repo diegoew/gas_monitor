@@ -11,9 +11,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 /**
  * Created by vladpopescu on 12/17/17.
@@ -29,6 +32,14 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
 
         List<Reading> readings = new ArrayList<>();
 
+        int timeZoneOffset = (startDateTime.getTimezoneOffset()/60);
+
+        log.info("startDate: {}", AuroraDbUtils.getDate(startDateTime));
+        log.info("endDateTime: {}", AuroraDbUtils.getDate(endDateTime));
+
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         jdbcTemplate.query(
                 "SELECT * from reading WHERE " +
                         (gasName.equals(RestApiConsts.all) ? "" : " gasName in " + AuroraDbUtils.getInClauseList(gasName) + " and ") +
@@ -38,8 +49,26 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
                         " ' and instant <= '" + AuroraDbUtils.getDate(endDateTime) + "'" +
                         " order by instant desc",
                 new Object[] { },
-                (rs, rowNum) -> Reading.builder()
-                        .instant(new Date(rs.getTimestamp("instant").getTime()))
+                (rs, rowNum) -> {
+
+                    Timestamp tsFromDb = rs.getTimestamp("instant");
+
+                    log.info("from db: {}", tsFromDb);
+
+                    cal.setTime(tsFromDb);
+
+//                    log.info("cal: {}", cal);
+
+                    cal.add(Calendar.HOUR_OF_DAY, -timeZoneOffset);
+
+//                    log.info("cal: {}", cal);
+
+                    Date dToReturn = new Date(cal.getTimeInMillis());
+
+                    log.info("modified: {}", dToReturn);
+
+                    return Reading.builder()
+                        .instant(dToReturn)
                         .deviceId(rs.getString("deviceId"))
                         .gasName(rs.getString("gasName"))
                         .reading(rs.getDouble("reading"))
@@ -51,7 +80,7 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
                         .relativeHumidity(rs.getDouble("relHumidity"))
                         .tempInCelsius(rs.getDouble("tempInCelsius"))
                         .ro(rs.getDouble("ro"))
-                        .build()
+                        .build();}
         ).forEach(reading -> {
             //log.debug(reading.toString());
             readings.add(reading);

@@ -1,21 +1,19 @@
 package org.protectplayanow.api.gaslevel.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.protectplayanow.api.config.RestApiConsts;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Created by vladpopescu on 12/17/17.
  */
+@Slf4j
 public class AuroraDbUtils {
 
     public static String getInClauseStringList(Collection<String> strings){
@@ -32,6 +30,16 @@ public class AuroraDbUtils {
 
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static String getDate(Date startDate) {
-        return df.format(startDate);
+
+        //log.info("startdate: {}", startDate);
+
+        ZonedDateTime d = ZonedDateTime.ofInstant(startDate.toInstant(),
+                ZoneId.ofOffset("UTC", ZoneOffset.ofHours(startDate.getTimezoneOffset()/60)));
+
+        String fromattedDate = d.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        //log.info("fromattedDate: {}", fromattedDate);
+
+        return fromattedDate;
     }
 }
