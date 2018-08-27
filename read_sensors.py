@@ -25,6 +25,12 @@ parser = argparse.ArgumentParser(
     + '\nTo configure, edit file config.py.'
 )
 
+parser.add_argument('--calibrate',
+                    action='store_true',
+                    default=False,
+                    help='Calibrate the sensors and store the results.'
+                         'Do not start measuring.')
+
 
 def timestamp(dt):
     """Format the datetime dt to a string that includes time zone offset.
@@ -74,6 +80,19 @@ def upload_recorded():
                 break
 
 
+def get_ros():
+    ros = db.get_ros()
+    if not ros:
+        ros = calibrate()
+    return ros
+
+
+def calibrate():
+    ros = [sensor.calibrate(i) for i in range(len(SENSOR_TYPES))]
+    db.store_ros(*ros)
+    return ros
+
+
 def run():
     sensor.spi.open(0, 0)
 
@@ -81,7 +100,7 @@ def run():
         print('Press Ctrl+C to abort')
         logging.info('Program started')
 
-        ros = [sensor.calibrate(i) for i in range(len(SENSOR_TYPES))]
+        ros = get_ros()
 
         print('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
@@ -92,7 +111,7 @@ def run():
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
-                db.record(dt, sensor_type, val, ro, temp, hum)
+                db.store_measurement(dt, sensor_type, val, ro, temp, hum)
                 upload_recorded()
                 time.sleep(REPEAT_DELAY_SECONDS)
 
@@ -101,6 +120,10 @@ def run():
         logging.info('Abort by user')
         db.close_connection()
 
+
 if __name__ == '__main__':
     args = parser.parse_args()
-    run()
+    if args.calibrate:
+        calibrate()
+    else:
+        run()
