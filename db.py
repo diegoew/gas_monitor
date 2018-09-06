@@ -33,7 +33,7 @@ def record(ts, sensor_type, reading, ro, temperature=None, rel_humidity=None,
         try:
             cursor.execute(
                 'INSERT INTO %s' % DB_TABLE
-                + '(ts, sensor, reading, ro, upload_ts)'
+                + '(ts, sensor, reading, ro, temperature, rel_humidity, upload_ts)'
                 + ' VALUES (%s, %s, %s, %s, %s, %s, %s);',
                 (ts, sensor_type, reading, ro, temperature, rel_humidity,
                  upload_ts))
