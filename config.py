@@ -20,3 +20,4 @@ import logging
 logging.basicConfig(filename="gas_readings.log",
                     format='%(asctime)-15s %(message)s',
                     level=logging.INFO)
+logging.getLogger().addHandler(logging.StreamHandler())
