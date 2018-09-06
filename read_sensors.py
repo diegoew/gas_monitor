@@ -63,14 +63,14 @@ def upload_recorded():
             try:
                 upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
-                logging.error('Failed to upload measurement %s: %s', (id_, e))
+                logging.error('Failed to upload measurement %s: %s', id_, e)
                 break
 
             try:
                 db.record_uploaded_time()
             except Exception as e:
                 logging.error('Failed to record the upload timestamp for'
-                              ' measurement %s: %s', (id_, e))
+                              ' measurement %s: %s', id_, e)
                 break
 
 

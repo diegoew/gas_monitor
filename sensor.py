@@ -45,6 +45,6 @@ def calibrate(pin_num):
     ro = (1023 / val - 1) * lr / arr
 
     print('Val:', val, 'Ro:', ro)
-    logging.info('Ro=%g' % ro)
+    logging.info('Ro=%g', ro)
 
     return ro

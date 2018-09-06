@@ -38,7 +38,8 @@ def record(ts, sensor_type, reading, ro, temperature=None, rel_humidity=None,
                 (ts, sensor_type, reading, ro, temperature, rel_humidity,
                  upload_ts))
         except Exception as e:
-            logging.error('Failed to record measurement into DB:', e)
+            logging.error('Failed to record measurement into DB: %s', e)
+            print('Failed to record measurement into DB: %s' % e)
 
 
 def get_not_uploaded():

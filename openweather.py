@@ -25,7 +25,7 @@ def _set_openweather():
         response.raise_for_status()
         parsed = response.json()['main']
     except Exception as e:
-        logging.error('Failed to get weather:', e)
+        logging.error('Failed to get weather: %s', e)
         return
     temperature = parsed['temp']
     rel_humidity = parsed['humidity'] / 100.0
