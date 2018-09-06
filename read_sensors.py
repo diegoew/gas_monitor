@@ -18,7 +18,7 @@ import openweather
 import sensor
 
 
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 parser = argparse.ArgumentParser(
     description='Read gas sensors ' + ', '.join(SENSOR_TYPES)
@@ -27,8 +27,12 @@ parser = argparse.ArgumentParser(
 
 
 def timestamp(dt):
-    td_str = dt.strftime(DATETIME_FORMAT)
-    return td_str[:-2] + ':' + td_str[-2:]
+    """Format the datetime dt to a string that includes time zone offset.
+    If dt is not zone aware, use the OS offset."""
+    dt_str = dt.strftime(DATETIME_FORMAT)
+    tz_str = dt.strftime('%z') \
+             or datetime.now(timezone.utc).astimezone().strftime('%z')
+    return dt_str + tz_str[:-2] + ':' + tz_str[-2:]
 
 
 def upload(dt, sensor_type, reading, ro=None, temperature=None,
