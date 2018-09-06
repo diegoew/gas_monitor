@@ -63,14 +63,14 @@ def record_uploaded_time(id_):
                        (datetime.now(), id_))
 
 
-def get_ros():
+def get_ro(sensor_type):
     with get_connection().cursor() as cursor:
-        cursor.execute('SELECT MQ2, MQ9, MQ135 FROM ros'
-                       ' ORDER BY ts DESC LIMIT 1;')
+        cursor.execute('SELECT ro FROM ros WHERE sensor = %s'
+                       ' ORDER BY ts DESC LIMIT 1;', sensor_type)
         return cursor.fetchone()
 
 
-def store_ros(mq_2, mq_9, mq_135):
+def store_ro(sensor_type, ro):
     with get_connection().cursor() as cursor:
-        cursor.execute('INSERT INTO ros (MQ2, MQ9, MQ135) values (%s, %s, %s);',
-                       [mq_2, mq_9, mq_135])
+        cursor.execute('INSERT INTO ros (sensor, ro) values (%s, %s);',
+                       [sensor_type, ro])
