@@ -67,7 +67,7 @@ def upload_recorded():
                 break
 
             try:
-                db.record_uploaded_time()
+                db.record_uploaded_time(id_)
             except Exception as e:
                 logging.error('Failed to record the upload timestamp for'
                               ' measurement %s: %s', id_, e)
