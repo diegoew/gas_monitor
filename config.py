@@ -17,7 +17,7 @@ OPENWEATHER_KEY = '177f943c86860b2efb332b00962ac509'
 WEATHER_RETRIEVAL_INTERVAL_SECONDS = 60
 
 import logging
-logging.basicConfig(filename="gas_readings.log",
+logging.basicConfig(filename="gas-measurements.log",
                     format='%(asctime)-15s %(message)s',
                     level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler())
