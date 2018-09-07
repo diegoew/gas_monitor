@@ -27,8 +27,8 @@ def close_connection():
             pass
 
 
-def record(ts, sensor_type, reading, ro, temperature=None, rel_humidity=None,
-           upload_ts=None):
+def store_measurement(ts, sensor_type, reading, ro, temperature=None,
+                      rel_humidity=None, upload_ts=None):
     with get_connection().cursor() as cursor:
         try:
             cursor.execute(
@@ -61,3 +61,16 @@ def record_uploaded_time(id_):
         cursor.execute('UPDATE %s' % DB_TABLE
                        + ' SET upload_ts = %s WHERE id = %s;',
                        (datetime.now(), id_))
+
+
+def get_ro(sensor_type):
+    with get_connection().cursor() as cursor:
+        cursor.execute('SELECT ro FROM ros WHERE sensor = %s'
+                       ' ORDER BY ts DESC LIMIT 1;', sensor_type)
+        return cursor.fetchone()
+
+
+def store_ro(sensor_type, ro):
+    with get_connection().cursor() as cursor:
+        cursor.execute('INSERT INTO ros (sensor, ro) values (%s, %s);',
+                       [sensor_type, ro])
