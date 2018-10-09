@@ -97,12 +97,11 @@ def run():
     sensor.spi.open(0, 0)
 
     try:
-        print('Press Ctrl+C to abort')
-        logging.info('Program started')
+        logging.info('\nProgram started. Press Ctrl+C to stop')
 
         ros = get_ros()
 
-        print('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
+        logging.info('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
             sys.stdout.write('\r\033[K')
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
@@ -116,8 +115,7 @@ def run():
                 time.sleep(REPEAT_DELAY_SECONDS)
 
     except KeyboardInterrupt:
-        print('\nAbort by user')
-        logging.info('Abort by user')
+        logging.info('Stopped by user')
         db.close_connection()
 
 if __name__ == '__main__':
