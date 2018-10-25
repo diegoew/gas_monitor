@@ -4,6 +4,7 @@ LON = '-118.437404'
 SERVER_URL = 'http://34.223.248.143/readings/calculate'
 REPEAT_DELAY_SECONDS = 60
 SENSOR_TYPES = ['MQ-2', 'MQ-9', 'MQ-135']
+ADS1115_GAIN = 2/3  # For reading voltages from -6.144V to +6.144V.
 LOAD_RESISTANCES = [5, 18, 20]
 AIR_RESISTANCE_RATIOS = [9.48, 9.71, 3.59]
 DB_HOST = 'localhost'

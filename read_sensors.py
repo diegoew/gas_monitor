@@ -15,7 +15,7 @@ from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
     SENSOR_TYPES
 import db
 import openweather
-import sensor
+import ads1115 as sensors
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -88,13 +88,13 @@ def get_ros():
 
 
 def calibrate():
-    ros = [sensor.calibrate(i) for i in range(len(SENSOR_TYPES))]
+    ros = [sensors.calibrate(i) for i in range(len(SENSOR_TYPES))]
     db.store_ros(*ros)
     return ros
 
 
 def run():
-    sensor.spi.open(0, 0)
+    sensors.init()
 
     try:
         logging.info('\nProgram started. Press Ctrl+C to stop')
@@ -105,7 +105,7 @@ def run():
         while True:
             sys.stdout.write('\r\033[K')
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
-                val = sensor.read_adc(pin_num)
+                val = sensors.read(pin_num)
                 dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()

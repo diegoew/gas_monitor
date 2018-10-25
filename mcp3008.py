@@ -5,10 +5,15 @@ import spidev
 from config import SENSOR_TYPES, LOAD_RESISTANCES, AIR_RESISTANCE_RATIOS
 
 
-spi = spidev.SpiDev()
+spi = None
 
 
-def read_adc(pin_num):
+def init():
+    global spi
+    spi = spidev.SpiDev()
+
+
+def read(pin_num):
     """
     :return SPI data from the MCP3008 analogue-to-digital converter (ADC),
     from 8 channels in total.
@@ -34,7 +39,7 @@ def calibrate(pin_num):
 
     val = 0.0
     for _ in range(50):
-        val += read_adc(pin_num)
+        val += read(pin_num)
     val /= 50
 
     if val == 0:
