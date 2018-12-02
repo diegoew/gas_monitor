@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * Created by vladpopescu on 12/17/17.
  */
-public class RestApiConsts {
+public class Constants {
     public static final String
 
             dateTimePattern = "yyyy-MM-dd'T'HH:mm:ssXXX",
@@ -34,7 +34,10 @@ public class RestApiConsts {
             toluene = "toluene",
             acetone = "acetone",
 
-            deviceId = "RaspPi-Prototype-1",
+            diegosDeviceId = "RaspPi-Prototype-1",
+            vladsDeviceId = "RaspPi-Vlad-old-script",
+
+            resolution = "32767",
 
             get = "get",
             set = "set",
@@ -48,7 +51,8 @@ public class RestApiConsts {
             mq135 = "MQ-135",
             sensorTypeList = "[MQ-2],[MQ-9],[MQ-135]",
 
-            PleaseSendDeviceIdNextTime = "PleaseSendDeviceIdNextTime"
+            PleaseSendDeviceIdNextTime = "PleaseSendDeviceIdNextTime",
+            deviceIdParam = "deviceId"
             ;
 
     public static final String
@@ -56,11 +60,11 @@ public class RestApiConsts {
             ;
 
     public static final String
-            apiDateMessage = "pass in strings " + RestApiConsts.dateKeys + ", or date with pattern [" + RestApiConsts.dateTimePatternExample + "]"
+            apiDateMessage = "pass in strings " + Constants.dateKeys + ", or date with pattern [" + Constants.dateTimePatternExample + "]"
             ;
 
     public static final String
-            apiInstantDateMessage = "pass in string [" + RestApiConsts.now + "] or date with pattern [" + RestApiConsts.dateTimePatternExample + "]"
+            apiInstantDateMessage = "pass in string [" + Constants.now + "] or date with pattern [" + Constants.dateTimePatternExample + "]"
             ;
 
     public static final String
@@ -73,7 +77,7 @@ public class RestApiConsts {
                                                         .joining(","));
 
     public static final String
-            apiGasMessage = "pass in strings " + RestApiConsts.gasKeys + ", or other gas names that sensors have reported"
+            apiGasMessage = "pass in strings " + Constants.gasKeys + ", or other gas names that sensors have reported"
             ;
 
 
@@ -96,7 +100,7 @@ public class RestApiConsts {
         HttpHeaders responseHeaders = new HttpHeaders();
 
         responseHeaders.set("Access-Control-Allow-Origin", "*");
-        responseHeaders.set(RestApiConsts.readingFrequency, readingFrequency);
+        responseHeaders.set(Constants.readingFrequency, readingFrequency);
 
         return responseHeaders;
 
