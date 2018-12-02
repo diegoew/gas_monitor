@@ -5,19 +5,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.protectplayanow.api.config.RestApiConsts;
+import org.protectplayanow.api.config.Constants;
 
 import java.util.*;
 
 /**
- * Created by vladpopescu on 12/12/17.instant, deviceId, gasName, reading, unitOfReading, latitude, longitude
+ * Created by vladpopescu on 12/12/17
  */
 @Data
 @Builder
 @Slf4j
 public class Reading {
 
-    @JsonFormat(pattern = RestApiConsts.dateTimePattern)
+    @JsonFormat(pattern = Constants.dateTimePattern)
     private Date instant;
 
     private String deviceId, gasName, unitOfReading, sensorType;
@@ -25,6 +25,8 @@ public class Reading {
     private double latitude, longitude, reading, tempInCelsius, relativeHumidity, input;
 
     private double ro;
+
+    private double resolution;
 
     private static final double RL_MQ2 = 5;
     private static final double RL_MQ9 = 18;
@@ -36,52 +38,53 @@ public class Reading {
 
         final double input = this.getReading() == 0 ? .0001 : this.getReading();
 
-
-        log.info("input: {}", input);
-
         double ro = 0;  //to_do this value needs to be updatd
 
         double loadResistance = 0;
         Map<String, CalcConsts> calcMap = new HashMap<>();
 
         switch (this.sensorType) {
-            case RestApiConsts.mq2 :
+            case Constants.mq2 :
                 loadResistance = RL_MQ2;
                 ro = this.getRo() == 0 ? 6 : this.getRo();
-                calcMap.put(RestApiConsts.h2, new CalcConsts(957.82, -2.108));
-                calcMap.put(RestApiConsts.lpg, new CalcConsts(569.12, -2.124));
-                calcMap.put(RestApiConsts.Methane, new CalcConsts(4295.6, -2.642));
-                calcMap.put(RestApiConsts.co, new CalcConsts(28548, -2.968));
-                calcMap.put(RestApiConsts.alcohol, new CalcConsts(3480.4, -2.699));
-                calcMap.put(RestApiConsts.smoke, new CalcConsts(4013.8, -2.367));
-                calcMap.put(RestApiConsts.propane, new CalcConsts(626.13, -2.176));
+                calcMap.put(Constants.h2, new CalcConsts(957.82, -2.108));
+                calcMap.put(Constants.lpg, new CalcConsts(569.12, -2.124));
+                calcMap.put(Constants.Methane, new CalcConsts(4295.6, -2.642));
+                calcMap.put(Constants.co, new CalcConsts(28548, -2.968));
+                calcMap.put(Constants.alcohol, new CalcConsts(3480.4, -2.699));
+                calcMap.put(Constants.smoke, new CalcConsts(4013.8, -2.367));
+                calcMap.put(Constants.propane, new CalcConsts(626.13, -2.176));
                 break;
 
-            case RestApiConsts.mq9 :
+            case Constants.mq9 :
                 loadResistance = RL_MQ9;
                 ro = this.getRo() == 0 ? 50 : this.getRo();
-                calcMap.put(RestApiConsts.lpg, new CalcConsts(972.52, -2.133));
-                calcMap.put(RestApiConsts.co, new CalcConsts(579.05, -2.247));
-                calcMap.put(RestApiConsts.Methane, new CalcConsts(4286.3, -2.624));
+                calcMap.put(Constants.lpg, new CalcConsts(972.52, -2.133));
+                calcMap.put(Constants.co, new CalcConsts(579.05, -2.247));
+                calcMap.put(Constants.Methane, new CalcConsts(4286.3, -2.624));
                 break;
 
-            case RestApiConsts.mq135 :
+            case Constants.mq135 :
                 loadResistance = RL_MQ135;
                 ro = this.getRo() == 0 ? 80 : this.getRo();
-                calcMap.put(RestApiConsts.co2, new CalcConsts(111.87, -2.893));
-                calcMap.put(RestApiConsts.co, new CalcConsts(573.78, -3.924));
-                calcMap.put(RestApiConsts.alcohol, new CalcConsts(78.85, -3.206));
-                calcMap.put(RestApiConsts.ammonia, new CalcConsts(101.42, -2.482));
-                calcMap.put(RestApiConsts.toluene, new CalcConsts(45.116, -3.479));
-                calcMap.put(RestApiConsts.acetone, new CalcConsts(34.848, -3.459));
+                calcMap.put(Constants.co2, new CalcConsts(111.87, -2.893));
+                calcMap.put(Constants.co, new CalcConsts(573.78, -3.924));
+                calcMap.put(Constants.alcohol, new CalcConsts(78.85, -3.206));
+                calcMap.put(Constants.ammonia, new CalcConsts(101.42, -2.482));
+                calcMap.put(Constants.toluene, new CalcConsts(45.116, -3.479));
+                calcMap.put(Constants.acetone, new CalcConsts(34.848, -3.459));
                 break;
         }
 
         double roFromDefaultOrRecievedValue = ro;
 
-        double rs_over_ro = ((((1023/input)-1)*loadResistance)/roFromDefaultOrRecievedValue)
+        double res = (getDeviceId().equals("RaspPi-Vlad-old-script")||getDeviceId().equals("RaspPi-Prototype-1")) ? 1023 : resolution;
+
+        double rs_over_ro = ((((res/input)-1)*loadResistance)/roFromDefaultOrRecievedValue)
                             /
                             ((.00007*(this.relativeHumidity*100)-.0158)*this.tempInCelsius + (-(.0074*this.relativeHumidity*100) + 1.7761));
+
+        log.info("input: {}", input);
 
 
         log.trace("roFromDefaultOrRecievedValue: {}", roFromDefaultOrRecievedValue);
@@ -100,6 +103,7 @@ public class Reading {
                     .longitude(this.longitude)
                     .relativeHumidity(this.relativeHumidity)
                     .tempInCelsius(this.tempInCelsius)
+                    .resolution(res)
                     .ro(roFromDefaultOrRecievedValue)
                     .input(input)
                     .unitOfReading("ppm")

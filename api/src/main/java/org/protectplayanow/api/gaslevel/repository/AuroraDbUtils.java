@@ -1,7 +1,6 @@
 package org.protectplayanow.api.gaslevel.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.protectplayanow.api.config.RestApiConsts;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -28,7 +27,7 @@ public class AuroraDbUtils {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(ts.getTime()), ZoneId.of("UTC"));
     }
 
-    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public static String getDate(Date startDate) {
 
         //log.info("startdate: {}", startDate);
@@ -42,4 +41,11 @@ public class AuroraDbUtils {
 
         return fromattedDate;
     }
+
+    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    {df.setTimeZone(TimeZone.getTimeZone("UTC"));}
+    public static String makeDateforUTC(Date d){
+        return df.format(d);
+    }
+
 }

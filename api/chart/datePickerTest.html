@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Gas Sensors - Protect Playa Now</title><meta property="og:site_name" content="Protect Playa Now" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js"></script>
+</head>
+<body>
+
+<p>Date: <input type="text" id="startPicker" value="pick a date"></p>
+
+<script>
+
+  $( function() {
+
+    $( "#startPicker" ).datepicker({
+
+    onSelect: function(datetext){
+
+        var d = new Date(); // for now
+
+        var h = d.getHours();
+        h = (h < 10) ? ("0" + h) : h ;
+
+        var m = d.getMinutes();
+        m = (m < 10) ? ("0" + m) : m ;
+
+        var s = d.getSeconds();
+        s = (s < 10) ? ("0" + s) : s ;
+
+        datetext = datetext + " " + h + ":" + m + ":" + s;
+
+        $('#startPicker').val(datetext);
+    }
+
+    });
+
+  } );
+
+  $( function() {
+
+    $( "#endPicker" ).datepicker({
+
+    onSelect: function(datetext){
+
+        var d = new Date(); // for now
+
+        var h = d.getHours();
+        h = (h < 10) ? ("0" + h) : h ;
+
+        var m = d.getMinutes();
+        m = (m < 10) ? ("0" + m) : m ;
+
+        var s = d.getSeconds();
+        s = (s < 10) ? ("0" + s) : s ;
+
+        datetext = datetext + " " + h + ":" + m + ":" + s;
+
+        $('#endPicker').val(datetext);
+    }
+
+    });
+
+  } );
+</script>
+
+</body>
+</html>

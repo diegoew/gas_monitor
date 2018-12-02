@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.protectplayanow.api.config.RestApiConsts;
+import org.protectplayanow.api.config.Constants;
 import org.protectplayanow.api.gaslevel.view.rest.DeviceForRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -15,10 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +40,7 @@ public class GasLevelController {
     private final AtomicLong counter = new AtomicLong();
     public static final ConcurrentHashMap<String, String> globalValueMap = new ConcurrentHashMap<>();
     static {
-        globalValueMap.put( RestApiConsts.readingFrequency, RestApiConsts.readingFreq70 );
+        globalValueMap.put( Constants.readingFrequency, Constants.readingFreq70 );
     }
 
     @Autowired
@@ -59,17 +57,17 @@ public class GasLevelController {
     public ResponseEntity<String> setOrGetGlobalValue(
 
             @ApiParam(value = "use this endpoint to get and set global values")
-            @RequestParam(value = "action", defaultValue = RestApiConsts.get, required = true)
+            @RequestParam(value = "action", defaultValue = Constants.get, required = true)
                     String action,
 
             @ApiParam(value = "enter the value 'key' aka value 'name'")
-            @RequestParam(value = "key", defaultValue = RestApiConsts.readingFrequency, required = false)
-            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+            @RequestParam(value = "key", defaultValue = Constants.readingFrequency, required = false)
+            @DateTimeFormat(pattern = Constants.dateTimePattern)
                     String key,
 
             @ApiParam(value = "enter the new value for the key that you are sending")
-            @RequestParam(value = "value", defaultValue = RestApiConsts.readingFreq70, required = false)
-            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+            @RequestParam(value = "value", defaultValue = Constants.readingFreq70, required = false)
+            @DateTimeFormat(pattern = Constants.dateTimePattern)
                     String value
 
     ) {
@@ -82,15 +80,15 @@ public class GasLevelController {
 
         log.info("previousValue={}", previousValue);
 
-        if( action.equals( RestApiConsts.get ) ) {
+        if( action.equals( Constants.get ) ) {
             value = globalValueMap.get( key );
-        } else if ( action.equals( RestApiConsts.set ) ) {
+        } else if ( action.equals( Constants.set ) ) {
             value = globalValueMap.put( key, value );
         }
 
         value = globalValueMap.get( key );
 
-        HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
+        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.readingFrequency));
 
         return new ResponseEntity<String>(
                 "thanks for submitting a '" + action +
@@ -110,7 +108,7 @@ public class GasLevelController {
     @RequestMapping(value = "/devices", method = RequestMethod.GET)
     public ResponseEntity<List<DeviceForRest>> getDevices(){
 
-        HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
+        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.readingFrequency));
 
         return new ResponseEntity<List<DeviceForRest>>(
                 DeviceForRest.make(gasLevelRepo.getDevices()),
@@ -125,26 +123,26 @@ public class GasLevelController {
     @RequestMapping(value = "/readings", method = RequestMethod.GET)
     public ResponseEntity<List<Reading>> getReadings(
 
-            @ApiParam(value = RestApiConsts.apiGasMessage)
-            @RequestParam(value = "gasName", defaultValue = RestApiConsts.all, required = false)
+            @ApiParam(value = Constants.apiGasMessage)
+            @RequestParam(value = "gasName", defaultValue = Constants.all, required = false)
                     String gasName,
 
-            @ApiParam(value = RestApiConsts.apiDateMessage)
-            @RequestParam(value = "startDateTime", defaultValue = RestApiConsts.dayago, required = false)
-            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+            @ApiParam(value = Constants.apiDateMessage)
+            @RequestParam(value = "startDateTime", defaultValue = Constants.dayago, required = false)
+            @DateTimeFormat(pattern = Constants.dateTimePattern)
                     Date startDateTime,
 
-            @ApiParam(value = RestApiConsts.apiDateMessage)
-            @RequestParam(value = "endDateTime", defaultValue = RestApiConsts.now, required = false)
-            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+            @ApiParam(value = Constants.apiDateMessage)
+            @RequestParam(value = "endDateTime", defaultValue = Constants.now, required = false)
+            @DateTimeFormat(pattern = Constants.dateTimePattern)
                     Date endDateTime,
 
             @ApiParam(value = "sensorType")
-            @RequestParam(value = "sensorType", defaultValue = RestApiConsts.mq9, required = false)
+            @RequestParam(value = "sensorType", defaultValue = Constants.mq9, required = false)
                     String sensorName,
 
             @ApiParam(value = "deviceId")
-            @RequestParam(value = "deviceId", defaultValue = RestApiConsts.deviceId, required = false)
+            @RequestParam(value = "deviceId", defaultValue = Constants.diegosDeviceId, required = false)
                     String deviceId
 
             ) {
@@ -153,7 +151,7 @@ public class GasLevelController {
 
         log.info("gasName={}, startDateTime={}, endDateTime={}", gasName, startDateTime, endDateTime);
 
-        HttpHeaders responseHeaders = RestApiConsts.makeGlobalHeaders(globalValueMap.get(RestApiConsts.readingFrequency));
+        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.readingFrequency));
 
         return new ResponseEntity<List<Reading>>(
                 gasLevelRepo.getGasReadings(gasName, startDateTime, endDateTime, sensorName, deviceId),
@@ -167,27 +165,27 @@ public class GasLevelController {
             @ApiResponse(code = 400, message = "You are not sending in the proper request. See 'warning' header for info, Buster!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/readings/calculate", method = RequestMethod.POST)
-    public ResponseEntity<Void> readingsWriteAfterCalculation(
+    public ResponseEntity<Void> setReadingsWriteAfterCalculation(
 
-            @ApiParam(value = "deviceId")
-            @RequestParam(value = "deviceId", defaultValue = RestApiConsts.PleaseSendDeviceIdNextTime, required = false)
+            @ApiParam(value = Constants.deviceIdParam)
+            @RequestParam(value = "deviceId", defaultValue = Constants.PleaseSendDeviceIdNextTime, required = false)
                     String deviceId,
 
-            @ApiParam(value = RestApiConsts.apiInstantDateMessage)
-            @RequestParam(value = "instant", defaultValue = RestApiConsts.now, required = false)
-            @DateTimeFormat(pattern = RestApiConsts.dateTimePattern)
+            @ApiParam(value = Constants.apiInstantDateMessage)
+            @RequestParam(value = "instant", defaultValue = Constants.now, required = false)
+            @DateTimeFormat(pattern = Constants.dateTimePattern)
                     Date instant,
 
-            @ApiParam(value = RestApiConsts.latitudePdr)
-            @RequestParam(value = "latitude", defaultValue = RestApiConsts.latitudePdr, required = false)
+            @ApiParam(value = Constants.latitudePdr)
+            @RequestParam(value = "latitude", defaultValue = Constants.latitudePdr, required = false)
                     double latitude,
 
-            @ApiParam(value = RestApiConsts.longitudePdr)
-            @RequestParam(value = "longitude", defaultValue = RestApiConsts.longitudePdr, required = false)
+            @ApiParam(value = Constants.longitudePdr)
+            @RequestParam(value = "longitude", defaultValue = Constants.longitudePdr, required = false)
                     double longitude,
 
-            @ApiParam(value = RestApiConsts.sensorTypeMsg)
-            @RequestParam(value = "sensorType", defaultValue = RestApiConsts.mq2, required = false)
+            @ApiParam(value = Constants.sensorTypeMsg)
+            @RequestParam(value = "sensorType", defaultValue = Constants.mq2, required = false)
                     String sensorType,
 
             @ApiParam(value = "this is the voltage reading that we will calculate")
@@ -204,8 +202,12 @@ public class GasLevelController {
 
             @ApiParam(value = "this value needs to be sent by the pi, if you don't know it we'll use defaults")
             @RequestParam(value = "relativeHumidity", defaultValue = ".10", required = false)
-                    double relativeHumidity
+                    double relativeHumidity,
 
+            @ApiParam(value = "this value needs to be sent by the pi, if you don't " +
+                    "know it we'll use the default value 32767")
+            @RequestParam(value = "resolution", defaultValue = "32767", required = false)
+                    double resolution
     ) {
 
         log.info("deviceId={}, instant={}, latitude={}, longitude={}, sensorTypeMsg={}", deviceId, instant, latitude, longitude, sensorType);
@@ -218,6 +220,7 @@ public class GasLevelController {
                 .reading(reading)
                 .input(reading)
                 .sensorType(sensorType)
+                .resolution(resolution)
                 .ro(ro)
                 .tempInCelsius(tempInCelsius)
                 .relativeHumidity(relativeHumidity)
@@ -225,8 +228,8 @@ public class GasLevelController {
 
         gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
 
-        return new ResponseEntity<Void>(RestApiConsts.makeGlobalHeaders(
-                globalValueMap.get(RestApiConsts.readingFrequency)),
+        return new ResponseEntity<Void>(Constants.makeGlobalHeaders(
+                globalValueMap.get(Constants.readingFrequency)),
                 HttpStatus.OK);
 
     }
@@ -234,31 +237,31 @@ public class GasLevelController {
     @InitBinder
     public void dataBinding(WebDataBinder binder) {
 
-        final DateFormat df = new SimpleDateFormat(RestApiConsts.dateTimePattern);
+        final DateFormat df = new SimpleDateFormat(Constants.dateTimePattern);
 
         final CustomDateEditor dateEditor = new CustomDateEditor(df, true) {
 
             @Override
             public void setAsText(String text) throws IllegalArgumentException {
 
-                if (RestApiConsts.now.equals(text)) {
+                if (Constants.now.equals(text)) {
                     setValue(new Date());
-                } else if (RestApiConsts.dayago.equals(text)) {
+                } else if (Constants.dayago.equals(text)) {
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(new Date());
                     cal.add(Calendar.DATE, -1);
                     setValue(new Date(cal.getTimeInMillis()));
-                } else if (RestApiConsts.weekago.equals(text)) {
+                } else if (Constants.weekago.equals(text)) {
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(new Date());
                     cal.add(Calendar.DATE, -7);
                     setValue(new Date(cal.getTimeInMillis()));
-                } else if (RestApiConsts.monthago.equals(text)) {
+                } else if (Constants.monthago.equals(text)) {
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(new Date());
                     cal.add(Calendar.DATE, -30);
                     setValue(new Date(cal.getTimeInMillis()));
-                } else if (RestApiConsts.yearago.equals(text)) {
+                } else if (Constants.yearago.equals(text)) {
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(new Date());
                     cal.add(Calendar.DATE, -365);
