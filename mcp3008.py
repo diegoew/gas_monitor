@@ -1,3 +1,7 @@
+"""
+This is an 8-channel, 10-bit analog-to-digital converter. It supports negative
+values, so we use 10 bits. So the resolution is 2^10 - 1 = 1023 values.
+"""
 import logging
 
 import spidev
@@ -23,6 +27,10 @@ def read(pin_num):
     return ((r[1] & 3) << 8) + r[2]
 
 
+def read_all():
+    return [read(i) for i in range(len(SENSOR_TYPES))]
+
+
 def calibrate(pin_num):
     """Calibrate sensor.
     :return Ro, the calculated sensor resistance for the given sensor type
@@ -34,7 +42,6 @@ def calibrate(pin_num):
     is almost constant for pure air and is given by the manufacturer.
     """
     sensor_type = SENSOR_TYPES[pin_num]
-    print('Calibrate ' + sensor_type)
     logging.info('Calibrate ' + sensor_type)
 
     val = 0.0
@@ -49,7 +56,6 @@ def calibrate(pin_num):
     arr = AIR_RESISTANCE_RATIOS[pin_num]
     ro = (1023 / val - 1) * lr / arr
 
-    print('Val:', val, 'Ro:', ro)
     logging.info('Ro=%g', ro)
 
     return ro
