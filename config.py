@@ -7,10 +7,7 @@ SENSOR_TYPES = ['MQ-2', 'MQ-9', 'MQ-135']
 ADS1115_GAIN = 2/3  # For reading voltages from -6.144V to +6.144V.
 LOAD_RESISTANCES = [5, 18, 20]
 AIR_RESISTANCE_RATIOS = [9.48, 9.71, 3.59]
-DB_HOST = 'localhost'
-DB_USER = 'gas_recorder'
-DB_PASSWORD = 'strawberry'
-DB = 'gas_measurements'
+DB = 'gas_measurements.sqlite'
 DB_TABLE = 'measurements'
 WEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 # Unique key per Gas Monitor, can be used up to 60 times per minute

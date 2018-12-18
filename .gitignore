@@ -9,3 +9,6 @@ venv
 
 # Log files
 *.log
+
+# SQLite DB
+gas_measurements.sqlite

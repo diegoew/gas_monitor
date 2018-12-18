@@ -6,6 +6,7 @@ record them to a local database and upload them to a Web service.
 import argparse
 from datetime import datetime, timezone
 import logging
+import re
 import sys
 import time
 
@@ -18,7 +19,10 @@ import openweather
 import ads1115 as sensors
 
 
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+DT_FORMAT = r'([0-9]{4}-[0-9]{2}-[0-9]{2}' \
+            r' [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6}-[0-9]{2}):([0-9]{2})'
+dt_re = re.compile(DT_FORMAT)
+
 
 parser = argparse.ArgumentParser(
     description='Read gas sensors ' + ', '.join(SENSOR_TYPES)
@@ -33,12 +37,10 @@ parser.add_argument('--calibrate',
 
 
 def timestamp(dt):
-    """Format the datetime dt to a string that includes time zone offset.
-    If dt is not zone aware, use the OS offset."""
-    dt_str = dt.strftime(DATETIME_FORMAT)
-    tz_str = dt.strftime('%z') \
-             or datetime.now(timezone.utc).astimezone().strftime('%z')
-    return dt_str + tz_str[:-2] + ':' + tz_str[-2:]
+    """Assume a TZ-aware timestring with a : in the timezone. Return a string
+    without the colon in the timezone."""
+    m = dt_re.match(dt)
+    return ''.join(m.groups())
 
 
 def upload(dt, sensor_type, reading, ro=None, temperature=None,
@@ -94,6 +96,7 @@ def calibrate():
 
 
 def run():
+    db.init()
     sensors.init()
 
     try:
