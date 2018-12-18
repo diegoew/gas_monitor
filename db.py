@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-import pymysql
+import sqlite3
 
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB, DB_TABLE
 
@@ -11,7 +11,7 @@ connection = None
 def get_connection():
     global connection
     if not connection or not connection.open:
-        connection = pymysql.connect(host=DB_HOST,
+        connection = sqlite3.connect(host=DB_HOST,
                                      user=DB_USER,
                                      password=DB_PASSWORD,
                                      db=DB,
