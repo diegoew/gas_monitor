@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Script to periodically read gas concentration measurements from sensors,
 record them to a local database and upload them to a Web service.
