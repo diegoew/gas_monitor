@@ -11,12 +11,12 @@ import sys
 import time
 
 import requests
+import openweather
 
 from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPES, ADC_RESOLUTION
+    SENSOR_TYPES, ADC_TYPE
 import db
-import openweather
-import ads1115 as sensors
+import adc as adc_
 
 
 dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
@@ -25,6 +25,7 @@ dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
             r'(?P<tz>-[0-9]{2}:[0-9]{2})'
 dt_re = re.compile(dt_format)
 
+adc = None
 
 parser = argparse.ArgumentParser(
     description='Read gas sensors ' + ', '.join(SENSOR_TYPES)
@@ -58,7 +59,7 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
         longitude=LON,
         sensorType=sensor_type,
         reading=reading,
-        resolution=ADC_RESOLUTION,
+        resolution=adc.RESOLUTION,
     )
     if ro is not None:
         data['ro'] = ro
@@ -90,39 +91,48 @@ def upload_recorded():
 
 
 def get_ros():
-    ros = db.get_ros()
-    if not ros:
-        ros = calibrate()
+    ros = []
+    for i, s in enumerate(SENSOR_TYPES):
+        r = db.get_ro(s)
+        if r is None:
+            r = calibrate(i)
+        ros.append(r)
     return ros
 
 
-def calibrate():
-    ros = [sensors.calibrate(i) for i in range(len(SENSOR_TYPES))]
-    db.store_ros(*ros)
-    return ros
+def calibrate(i):
+    r = adc.calibrate(i)
+    db.store_ro(SENSOR_TYPES[i], r)
+    return r
 
 
 def run():
+    global adc
+    adc = adc_.create(ADC_TYPE)
     db.init()
-    sensors.init()
 
     try:
-        logging.info('\nProgram started. Press Ctrl+C to stop')
+        logging.info('\nPress Ctrl+C to stop')
 
         ros = get_ros()
 
         logging.info('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
+            start = time.time()
+
             sys.stdout.write('\r\033[K')
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
-                val = sensors.read(pin_num)
+                val = adc.read(pin_num)
                 dt = datetime.now(timezone.utc).astimezone()
-                sys.stdout.write('%s:%g ' % (sensor_type, val))
+                sys.stdout.write('%s=%g ' % (sensor_type, val))
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_measurement(dt, sensor_type, val, ro, temp, hum)
                 upload_recorded()
-                time.sleep(REPEAT_DELAY_SECONDS)
+
+            sleep = REPEAT_DELAY_SECONDS + start - time.time()
+            if sleep > 0:
+                time.sleep(sleep)
 
     except KeyboardInterrupt:
         logging.info('Stopped by user')
@@ -131,6 +141,7 @@ def run():
 if __name__ == '__main__':
     args = parser.parse_args()
     if args.calibrate:
-        calibrate()
+        for i, _ in enumerate(SENSOR_TYPES):
+            calibrate(i)
     else:
         run()

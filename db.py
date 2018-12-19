@@ -3,8 +3,10 @@ import logging
 import os
 import sqlite3
 
-from config import DB, DB_TABLE
+from config import DB
 
+
+DB_TABLE = 'measurements'
 
 connection = None
 
@@ -29,7 +31,7 @@ def init():
         cursor = get_connection().cursor()
         cursor.executescript('''
         CREATE TABLE measurements(
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER NOT NULL PRIMARY KEY,
             ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             sensor VARCHAR(8),
             reading FLOAT,
@@ -39,11 +41,10 @@ def init():
             upload_ts TIMESTAMP NULL
         );
         CREATE TABLE ros(
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER NOT NULL PRIMARY KEY,
             ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            MQ2 FLOAT,
-            MQ9 FLOAT,
-            MQ135 FLOAT
+            sensor VARCHAR(8),
+            ro FLOAT
         );''')
 
 
@@ -71,7 +72,7 @@ def get_not_uploaded():
                        + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
         return cursor.fetchall()
     except Exception as e:
-        logging.error('Failed to get recorded measurements')
+        logging.error('Failed to get recorded measurements: %s', e)
         return
 
 
@@ -84,15 +85,17 @@ def record_uploaded_time(id_):
     get_connection().commit()
 
 
-def get_ros():
+def get_ro(sensor_type):
     cursor = get_connection().cursor()
-    cursor.execute('SELECT MQ2, MQ9, MQ135 FROM ros'
-                   ' ORDER BY ts DESC LIMIT 1;')
-    return cursor.fetchone()
+    cursor.execute('SELECT ro FROM ros WHERE sensor = ?'
+                   ' ORDER BY ts DESC LIMIT 1;', [sensor_type])
+    res = cursor.fetchone()
+    if res is not None:
+        return res[0]
 
 
-def store_ros(mq_2, mq_9, mq_135):
+def store_ro(sensor_type, ro):
     cursor = get_connection().cursor()
-    cursor.execute('INSERT INTO ros (MQ2, MQ9, MQ135) values (?, ?, ?);',
-                   [mq_2, mq_9, mq_135])
+    cursor.execute('INSERT INTO ros (sensor, ro) values (?, ?);',
+                   [sensor_type, ro])
     get_connection().commit()
