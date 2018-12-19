@@ -3,8 +3,10 @@ import logging
 import os
 import sqlite3
 
-from config import DB, DB_TABLE
+from config import DB
 
+
+DB_TABLE = 'measurements'
 
 connection = None
 
