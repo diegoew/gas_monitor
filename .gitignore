@@ -7,8 +7,12 @@
 # Python virtual environment
 venv
 
+# Backup files
+*~
+.*.swp
+
 # Log files
 *.log
 
 # SQLite DB
-gas_measurements.sqlite
+*.sqlite
