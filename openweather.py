@@ -3,10 +3,10 @@ import logging
 
 import requests
 
-from config import WEATHER_URL, OPENWEATHER_KEY, LAT, LON, \
-    WEATHER_RETRIEVAL_INTERVAL_SECONDS
+from config import LAT, LON, OPENWEATHER_KEY, WEATHER_RETRIEVAL_INTERVAL_SECONDS
 
 
+URL = 'http://api.openweathermap.org/data/2.5/weather'
 UNIT_TYPE = 'metric'  # imperial, metric or kelvin (default)
 temperature = None
 rel_humidity = None
@@ -21,7 +21,7 @@ def _set_openweather():
                   units=UNIT_TYPE,
                   mode='json')
     try:
-        response = requests.get(WEATHER_URL, params=params)
+        response = requests.get(URL, params=params)
         response.raise_for_status()
         parsed = response.json()['main']
     except Exception as e:
