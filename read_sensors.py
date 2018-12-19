@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Script to periodically read gas concentration measurements from sensors,
 record them to a local database and upload them to a Web service.
@@ -15,7 +15,7 @@ from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
     SENSOR_TYPES
 import db
 import openweather
-import ads1115 as sensors
+import sensor
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -88,13 +88,13 @@ def get_ros():
 
 
 def calibrate():
-    ros = [sensors.calibrate(i) for i in range(len(SENSOR_TYPES))]
+    ros = [sensor.calibrate(i) for i in range(len(SENSOR_TYPES))]
     db.store_ros(*ros)
     return ros
 
 
 def run():
-    sensors.init()
+    sensor.spi.open(0, 0)
 
     try:
         logging.info('\nProgram started. Press Ctrl+C to stop')
@@ -105,7 +105,7 @@ def run():
         while True:
             sys.stdout.write('\r\033[K')
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
-                val = sensors.read(pin_num)
+                val = sensor.read_adc(pin_num)
                 dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s:%g ' % (sensor_type, val))
                 sys.stdout.flush()

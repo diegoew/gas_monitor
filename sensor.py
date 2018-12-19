@@ -1,28 +1,21 @@
-"""
-This is an 8-channel, 16-bit analog-to-digital converter. It supports negative
-values, but sensors only supply positive values. So the resolution for those
-is 16 - 1 bits, or 2^15 - 1 = 32767 values.
-"""
 import logging
 
-import Adafruit_ADS1x15
+import spidev
 
-from config import ADS1115_GAIN, SENSOR_TYPES, LOAD_RESISTANCES,\
-    AIR_RESISTANCE_RATIOS
-
-
-RESOLUTION = 32767
-
-adc = None
+from config import SENSOR_TYPES, LOAD_RESISTANCES, AIR_RESISTANCE_RATIOS
 
 
-def init():
-    global adc
-    adc = Adafruit_ADS1x15.ADS1115()
+spi = spidev.SpiDev()
 
 
-def read(pin_num):
-    return adc.read_adc(pin_num, gain=ADS1115_GAIN)
+def read_adc(pin_num):
+    """
+    :return SPI data from the MCP3008 analogue-to-digital converter (ADC),
+    from 8 channels in total.
+    """
+    assert 0 <= pin_num < len(SENSOR_TYPES), 'Invalid pin number: %s' % pin_num
+    r = spi.xfer2([1, 8 + pin_num << 4, 0])
+    return ((r[1] & 3) << 8) + r[2]
 
 
 def calibrate(pin_num):
@@ -36,18 +29,22 @@ def calibrate(pin_num):
     is almost constant for pure air and is given by the manufacturer.
     """
     sensor_type = SENSOR_TYPES[pin_num]
+    print('Calibrate ' + sensor_type)
     logging.info('Calibrate ' + sensor_type)
+
     val = 0.0
     for _ in range(50):
-        val += read(pin_num)
+        val += read_adc(pin_num)
     val /= 50
+
     if val == 0:
         val += 0.0000001
 
     lr = LOAD_RESISTANCES[pin_num]
     arr = AIR_RESISTANCE_RATIOS[pin_num]
-    ro = (32767 / val - 1) * lr / arr
+    ro = (1023 / val - 1) * lr / arr
 
+    print('Val:', val, 'Ro:', ro)
     logging.info('Ro=%g', ro)
 
     return ro
