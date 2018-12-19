@@ -116,6 +116,8 @@ def run():
 
         logging.info('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
         while True:
+            start = time.time()
+
             sys.stdout.write('\r\033[K')
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
                 val = sensors.read(pin_num)
@@ -125,7 +127,10 @@ def run():
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_measurement(dt, sensor_type, val, ro, temp, hum)
                 upload_recorded()
-                time.sleep(REPEAT_DELAY_SECONDS)
+
+            sleep = REPEAT_DELAY_SECONDS + start - time.time()
+            if sleep > 0:
+                time.sleep(sleep)
 
     except KeyboardInterrupt:
         logging.info('Stopped by user')
