@@ -11,12 +11,12 @@ import sys
 import time
 
 import requests
+import openweather
 
 from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPES, ADC_RESOLUTION
+    SENSOR_TYPES, ADC_TYPE
 import db
-import openweather
-import ads1115 as sensors
+import adc as adc_
 
 
 dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
@@ -25,6 +25,7 @@ dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
             r'(?P<tz>-[0-9]{2}:[0-9]{2})'
 dt_re = re.compile(dt_format)
 
+adc = None
 
 parser = argparse.ArgumentParser(
     description='Read gas sensors ' + ', '.join(SENSOR_TYPES)
@@ -58,7 +59,7 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
         longitude=LON,
         sensorType=sensor_type,
         reading=reading,
-        resolution=ADC_RESOLUTION,
+        resolution=adc.RESOLUTION,
     )
     if ro is not None:
         data['ro'] = ro
@@ -100,14 +101,15 @@ def get_ros():
 
 
 def calibrate(i):
-    r = sensors.calibrate(i)
+    r = adc.calibrate(i)
     db.store_ro(SENSOR_TYPES[i], r)
     return r
 
 
 def run():
+    global adc
+    adc = adc_.create(ADC_TYPE)
     db.init()
-    sensors.init()
 
     try:
         logging.info('\nPress Ctrl+C to stop')
@@ -120,7 +122,7 @@ def run():
 
             sys.stdout.write('\r\033[K')
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
-                val = sensors.read(pin_num)
+                val = adc.read(pin_num)
                 dt = datetime.now(timezone.utc).astimezone()
                 sys.stdout.write('%s=%g ' % (sensor_type, val))
                 sys.stdout.flush()

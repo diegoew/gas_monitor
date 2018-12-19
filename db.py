@@ -94,5 +94,6 @@ def get_ro(sensor_type):
 
 def store_ro(sensor_type, ro):
     cursor = get_connection().cursor()
-    cursor.execute('INSERT INTO ros values (?, ?);', [sensor_type, ro])
+    cursor.execute('INSERT INTO ros (sensor, ro) values (?, ?);',
+                   [sensor_type, ro])
     get_connection().commit()
