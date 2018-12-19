@@ -70,7 +70,7 @@ def get_not_uploaded():
                        + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
         return cursor.fetchall()
     except Exception as e:
-        logging.error('Failed to get recorded measurements')
+        logging.error('Failed to get recorded measurements: %s', e)
         return
 
 

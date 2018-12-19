@@ -110,7 +110,7 @@ def run():
     sensors.init()
 
     try:
-        logging.info('\nProgram started. Press Ctrl+C to stop')
+        logging.info('\nPress Ctrl+C to stop')
 
         ros = get_ros()
 
@@ -122,7 +122,7 @@ def run():
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
                 val = sensors.read(pin_num)
                 dt = datetime.now(timezone.utc).astimezone()
-                sys.stdout.write('%s:%g ' % (sensor_type, val))
+                sys.stdout.write('%s=%g ' % (sensor_type, val))
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_measurement(dt, sensor_type, val, ro, temp, hum)
