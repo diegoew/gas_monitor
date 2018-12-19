@@ -90,16 +90,19 @@ def upload_recorded():
 
 
 def get_ros():
-    ros = db.get_ros()
-    if not ros:
-        ros = calibrate()
+    ros = []
+    for i, s in enumerate(SENSOR_TYPES):
+        r = db.get_ro(s)
+        if r is None:
+            r = calibrate(i)
+        ros.append(r)
     return ros
 
 
-def calibrate():
-    ros = [sensors.calibrate(i) for i in range(len(SENSOR_TYPES))]
-    db.store_ros(*ros)
-    return ros
+def calibrate(i):
+    r = sensors.calibrate(i)
+    db.store_ro(SENSOR_TYPES[i], r)
+    return r
 
 
 def run():
@@ -131,6 +134,7 @@ def run():
 if __name__ == '__main__':
     args = parser.parse_args()
     if args.calibrate:
-        calibrate()
+        for i, _ in enumerate(SENSOR_TYPES):
+            calibrate(i)
     else:
         run()
