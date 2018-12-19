@@ -19,9 +19,11 @@ import openweather
 import ads1115 as sensors
 
 
-DT_FORMAT = r'([0-9]{4}-[0-9]{2}-[0-9]{2}' \
-            r' [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6}-[0-9]{2}):([0-9]{2})'
-dt_re = re.compile(DT_FORMAT)
+dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
+            r' (?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})' \
+            r'.[0-9]{6}' \
+            r'(?P<tz>-[0-9]{2}:[0-9]{2})'
+dt_re = re.compile(dt_format)
 
 
 parser = argparse.ArgumentParser(
@@ -37,10 +39,14 @@ parser.add_argument('--calibrate',
 
 
 def timestamp(dt):
-    """Assume a TZ-aware timestring with a : in the timezone. Return a string
-    without the colon in the timezone."""
+    """Assume a timestring with format yyyy-mm-dd HH:MM:SS.uuuuuu-hh:mm.
+    Return a timestring with format yyyy-mm-ddTHH:MM:SS-hh:mm
+    Example:
+        input:  2018-12-18 22:23:35.901293-08:00
+        output: 2018-12-18T22:23:35-08:00
+        """
     m = dt_re.match(dt)
-    return ''.join(m.groups())
+    return m.group('date') + 'T' + m.group('time') + m.group('tz')
 
 
 def upload(dt, sensor_type, reading, ro=None, temperature=None,
@@ -57,9 +63,9 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
     if ro is not None:
         data['ro'] = ro
     if temperature is not None:
-        data['temperature'] = temperature
+        data['tempInCelsius'] = temperature
     if rel_humidity is not None:
-        data['rel_humidity'] = rel_humidity
+        data['relativeHumidity'] = rel_humidity
     response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
 
