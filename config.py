@@ -7,6 +7,7 @@ SENSOR_TYPES = ['MQ-2', 'MQ-9', 'MQ-135']
 ADS1115_GAIN = 2/3  # For reading voltages from -6.144V to +6.144V.
 LOAD_RESISTANCES = [5, 18, 20]
 AIR_RESISTANCE_RATIOS = [9.48, 9.71, 3.59]
+ADC_RESOLUTION = 32767  # 32767 for ADS, 1023 for MCP
 DB_HOST = 'localhost'
 DB_USER = 'gas_recorder'
 DB_PASSWORD = 'strawberry'
