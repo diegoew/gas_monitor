@@ -13,7 +13,7 @@ import time
 import requests
 
 from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPES
+    SENSOR_TYPES, ADC_RESOLUTION
 import db
 import openweather
 import ads1115 as sensors
@@ -52,6 +52,7 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
         longitude=LON,
         sensorType=sensor_type,
         reading=reading,
+        resolution=ADC_RESOLUTION,
     )
     if ro is not None:
         data['ro'] = ro
