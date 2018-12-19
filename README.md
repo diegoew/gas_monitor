@@ -10,16 +10,16 @@ Better understand fluctuations in air pollutants arising from natural gas operat
 - Ammonia (used for emission control to reduce NOx)
 - Formaldehyde
 
-### Setup
+### Requirements
 
 The basic setup of this air gas monitor consist of: 
 - MQ series sensors
 - ADS1115 analog-to-digital converter (ADC) - https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/ads1015-slash-ads1115
 - Raspberry Pi
 - Python program (this code) running on Raspberry Pi
-- Website to receive and disaplay readings
+- Website to receive and display measurements
 - Cloud sharing program
- 
+
 While the sensors react very fast, they are not exclusively sensitive to just 
 one type of gas. Therefore, readings might be skewed by other gases. 
 
@@ -33,12 +33,26 @@ one type of gas. Therefore, readings might be skewed by other gases.
 - Logs events and data to a file called: gas_readings.log
 - Optionally sends RO and raw data to website
 
+### Installation
+
+1. Connect a micro-USB 5V power to the Raspberry Pi port 1 
+1. Connect a micro-USB keyboard to the Raspberry Pi port 2
+1. Connect a display device via micro-HDMI to the Raspberry Pi micro-HTDMI port
+1. Log into the Raspberry Pi and open a terminal
+1. Execute `git clone https://github.com/diegoew/gas_monitor.git`
+1. Execute `cd gas_monitor`
+1. Execute `sudo pip3 install -r requirements.txt`
+1. Edit file `config.py`, at least `DEVICE_ID`, `LAT`, `LON`, `ADC_TYPE`, 
+`SENSOR_TYPES` and `OPENWEATHER_KEY`
+1. Execute `./read_sensors.py`
+
 ### More info
 
-*Natural Gas:
-- Natural gas is a fossil fuel composed almost entirely of methane, but also contains other hydrocarbon gases, including ethane, propane, butane and pentane. It also commonly includes varying amounts of other higher alkanes, and sometimes a small percentage of carbon dioxide, nitrogen, hydrogen sulfide, or helium. Natural gas that is derived from shale gas could include other chemical used in the extraction process of the gas. If mixed with biogas or landfill gas, it can also contain acids and other corrosive substances.
-- In order to assist in detecting leaks, an odorizer is added to the otherwise colorless and almost odorless natural gas. The odor has been compared to the smell of rotten eggs, due to the added tert-Butylthiol (t-butyl mercaptan). Sometimes, a related compound, thiophane, may be used in the mixture. These additives are also a deferent for humans to inhale the gas. The additives themselves are irritants that can cause nausea in humans, and have more severe health effects with prolonged exposure to the skin, eyes, kidneys, lungs and liver.
-- Natural gas extraction also produces radioactive isotopes of polonium (Po-210), lead (Pb-210) and radon (Rn-220). Radon is a gas with initial activity from 5 to 200,000 becquerels per cubic meter of gas. It decays rapidly to Pb-210 which can build up as a thin film in gas extraction equipment.
+Natural gas is a fossil fuel composed almost entirely of methane, but also contains other hydrocarbon gases, including ethane, propane, butane and pentane. It also commonly includes varying amounts of other higher alkanes, and sometimes a small percentage of carbon dioxide, nitrogen, hydrogen sulfide, or helium. Natural gas that is derived from shale gas could include other chemical used in the extraction process of the gas. If mixed with biogas or landfill gas, it can also contain acids and other corrosive substances.
+
+In order to assist in detecting leaks, an odorizer is added to the otherwise colorless and almost odorless natural gas. The odor has been compared to the smell of rotten eggs, due to the added tert-Butylthiol (t-butyl mercaptan). Sometimes, a related compound, thiophane, may be used in the mixture. These additives are also a deferent for humans to inhale the gas. The additives themselves are irritants that can cause nausea in humans, and have more severe health effects with prolonged exposure to the skin, eyes, kidneys, lungs and liver.
+
+Natural gas extraction also produces radioactive isotopes of polonium (Po-210), lead (Pb-210) and radon (Rn-220). Radon is a gas with initial activity from 5 to 200,000 becquerels per cubic meter of gas. It decays rapidly to Pb-210 which can build up as a thin film in gas extraction equipment.
 
 [Formulas to convert raw data into ppm gas readings](https://docs.google.com/spreadsheets/d/1bb9lcmV_HsYXKDZiz5pghnakAcYF63pO5d78DDjXMT4/edit?usp=sharing)
 
