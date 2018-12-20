@@ -35,16 +35,17 @@ one type of gas. Therefore, readings might be skewed by other gases.
 
 ### Installation
 
-1. Connect a micro-USB 5V power to the Raspberry Pi port 1 
-1. Connect a micro-USB keyboard to the Raspberry Pi port 2
-1. Connect a display device via micro-HDMI to the Raspberry Pi micro-HTDMI port
+1. Connect the Raspberry Pi:
+    - a micro-USB 5V power to port 1 
+    - a micro-USB keyboard to port 2
+    - a display device via micro-HDMI to micro-HTDMI port
 1. Log into the Raspberry Pi and open a terminal
-1. Execute `git clone https://github.com/diegoew/gas_monitor.git`
-1. Execute `cd gas_monitor`
-1. Execute `sudo pip3 install -r requirements.txt`
+1. Execute<br>`git clone https://github.com/diegoew/gas_monitor.git && cd gas_monitor && sudo pip3 install -r requirements.txt`
 1. Edit file `config.py`, at least `DEVICE_ID`, `LAT`, `LON`, `ADC_TYPE`, 
 `SENSOR_TYPES` and `OPENWEATHER_KEY`
-1. Execute `./read_sensors.py`
+1. Execute<br>`sudo cp gas-monitor.service /etc/systemd/system && sudo systemctl daemon-reload && sudo systemctl start gas-monitor.service`
+1. Check the service log: `journalctl -u gas-monitor.service` and 
+standard output: `tail -f /var/log/messages`. 
 
 ### More info
 
