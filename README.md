@@ -23,15 +23,16 @@ The basic setup of this air gas monitor consist of:
 While the sensors react very fast, they are not exclusively sensitive to just 
 one type of gas. Therefore, readings might be skewed by other gases. 
 
-### Program
+### Monitor software
 
 `read_sensors.py`
-- Optinally calibrates the sensors
+- Optinally calibrates the sensors (calculates Ro values)
   * Averages 50 samples in "clean air" to calculate RO for each sensor 
 - Periodically reads sensor data from the ADC
-- Displays the raw data onto the screen
-- Logs events and data to a file called: gas_readings.log
-- Optionally sends RO and raw data to website
+- Displays the readings to standard output
+- Logs events and data to a file
+- Stores readings to a local database
+- Sends data to a server to be aggregated and displayed on the website
 
 ### Installation
 
@@ -39,6 +40,7 @@ one type of gas. Therefore, readings might be skewed by other gases.
     - a micro-USB 5V power to port 1 
     - a micro-USB keyboard to port 2
     - a display device via micro-HDMI to micro-HTDMI port
+1. Connect the Raspberry Pi to the Internet
 1. Log into the Raspberry Pi and open a terminal
 1. Execute<br>`git clone https://github.com/diegoew/gas_monitor.git && cd gas_monitor && sudo pip3 install -r requirements.txt`
 1. Edit file `config.py`, at least `DEVICE_ID`, `LAT`, `LON`, `ADC_TYPE`, 
@@ -54,6 +56,8 @@ Natural gas is a fossil fuel composed almost entirely of methane, but also conta
 In order to assist in detecting leaks, an odorizer is added to the otherwise colorless and almost odorless natural gas. The odor has been compared to the smell of rotten eggs, due to the added tert-Butylthiol (t-butyl mercaptan). Sometimes, a related compound, thiophane, may be used in the mixture. These additives are also a deferent for humans to inhale the gas. The additives themselves are irritants that can cause nausea in humans, and have more severe health effects with prolonged exposure to the skin, eyes, kidneys, lungs and liver.
 
 Natural gas extraction also produces radioactive isotopes of polonium (Po-210), lead (Pb-210) and radon (Rn-220). Radon is a gas with initial activity from 5 to 200,000 becquerels per cubic meter of gas. It decays rapidly to Pb-210 which can build up as a thin film in gas extraction equipment.
+
+[Project notes](https://docs.google.com/document/d/1aLgA85S5O9_SXOJqAhFqrD8NQ2f40Iqx_LMBxXcsqhk)
 
 [Formulas to convert raw data into ppm gas readings](https://docs.google.com/spreadsheets/d/1bb9lcmV_HsYXKDZiz5pghnakAcYF63pO5d78DDjXMT4/edit?usp=sharing)
 
