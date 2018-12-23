@@ -6,8 +6,6 @@ LON = #-118.437404
 
 ADC_TYPE = 'ads1115'  # ads1115 or mcp3008
 SENSOR_TYPES = ['MQ-2', 'MQ-9', 'MQ-135']  # Sensors connected to each pin
-LOAD_RESISTANCES = [5, 18, 20]  # Per sensor
-AIR_RESISTANCE_RATIOS = [9.48, 9.71, 3.59]  # Per sensor
 
 OPENWEATHER_KEY =  #'177f943c86860b2efb332b00962ac509'
 # From https://home.openweathermap.org/api_keys
