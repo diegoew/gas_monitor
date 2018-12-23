@@ -107,8 +107,6 @@ def calibrate(i):
 
 
 def run():
-    global adc
-    adc = adc_.create(ADC_TYPE)
     db.init()
 
     try:
@@ -140,6 +138,9 @@ def run():
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    global adc
+    adc = adc_.create(ADC_TYPE)
+
     if args.calibrate:
         for i, _ in enumerate(SENSOR_TYPES):
             calibrate(i)
