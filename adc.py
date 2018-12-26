@@ -2,7 +2,8 @@ import logging
 
 import spidev
 
-from config import SENSOR_TYPES, LOAD_RESISTANCES, AIR_RESISTANCE_RATIOS
+from config import SENSOR_TYPES
+from sensors import LOAD_RESISTANCES, RSCO_RO_RATIOS
 
 
 class Adc:
@@ -33,8 +34,8 @@ class Adc:
         if val == 0:
             val += 0.0000001
 
-        lr = LOAD_RESISTANCES[pin_num]
-        arr = AIR_RESISTANCE_RATIOS[pin_num]
+        lr = LOAD_RESISTANCES[sensor_type]
+        arr = RSCO_RO_RATIOS[sensor_type]
         ro = (self.RESOLUTION / val - 1) * lr / arr
 
         logging.info('Ro=%g', ro)
