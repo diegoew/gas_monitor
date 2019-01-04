@@ -16,133 +16,92 @@
     <button id="hour1">Show last hour</button>
     <button id="hours6">Show last 6 hours</button>
     <button id="hours24">Show last 24 hours</button>
+    <button id="toggleOutput">Switch to Input Chart</button>
     <br />
     <br/>
     <div id="chart_div"></div>
     <script>
-
     var urlBase = "34.223.248.143";
+    var theDataType = "reading";
     <!--var urlBase = "localhost:8080";-->
-
 /*******/
-
 $( function() {
-
     $( "#startPicker" ).datepicker({
-
     onSelect: function(datetext){
-
         var d = new Date(); // for now
-
         var h = d.getHours();
         h = (h < 10) ? ("0" + h) : h ;
-
         var m = d.getMinutes();
         m = (m < 10) ? ("0" + m) : m ;
-
         var s = d.getSeconds();
         s = (s < 10) ? ("0" + s) : s ;
-
         datetext = datetext + " " + h + ":" + m + ":" + s;
-
         $('#startPicker').val(datetext);
     }
-
     });
-
   } );
-
   $( function() {
-
     $( "#endPicker" ).datepicker({
-
     onSelect: function(datetext){
-
         var d = new Date(); // for now
-
         var h = d.getHours();
         h = (h < 10) ? ("0" + h) : h ;
-
         var m = d.getMinutes();
         m = (m < 10) ? ("0" + m) : m ;
-
         var s = d.getSeconds();
         s = (s < 10) ? ("0" + s) : s ;
-
         datetext = datetext + " " + h + ":" + m + ":" + s;
-
         $('#endPicker').val(datetext);
     }
-
     });
-
   } );
-
   function subtractHoursFromDate(date, hours) {
     return new Date(date.setMinutes(date.getMinutes() - 60 * hours));
   }
-
     function makeDateStr(date){
         var d = date; // for now
-
         var year = d.getFullYear();
-
         var month = d.getMonth();
         month = month < 10 ? ("0" + month) : month;
         month++;
-
         var dayOfMonth = d.getDate();
         dayOfMonth = dayOfMonth < 10 ? ("0" + dayOfMonth) : dayOfMonth;
-
         var h = d.getHours();
         h = (h < 10) ? ("0" + h) : h ;
-
         var m = d.getMinutes();
         m = (m < 10) ? ("0" + m) : m ;
-
         var s = d.getSeconds();
         s = (s < 10) ? ("0" + s) : s ;
-
         return month + "/" + dayOfMonth + "/" + year + " " + h + ":" + m + ":" + s;
   }
-
   function modifyStartEndButtons(startTimeStr_){
-
         var startTimeStr = startTimeStr_;
         var endTimeStr = makeDateStr(new Date());
-
         console.log("startTime: " + startTimeStr);
         console.log("endTime: " + endTimeStr);
-
         $( "#endPicker" ).val(endTimeStr)
-
         $( "#startPicker" ).val(startTimeStr);
-
   }
-
       $("#hour1").click(function(){
         modifyStartEndButtons(makeDateStr( subtractHoursFromDate( new Date(), 1 ) ));
         redrawChart (theChart, theOptions);
       });
-
       $("#hours6").click(function(){
         modifyStartEndButtons(makeDateStr( subtractHoursFromDate( new Date(), 6 ) ));
         redrawChart (theChart, theOptions);
       });
-
       $("#hours24").click(function(){
         modifyStartEndButtons(makeDateStr( subtractHoursFromDate( new Date(), 24 ) ));
         redrawChart (theChart, theOptions);
       });
-
-
-
+      $("#toggleOutput").click(function(){
+        $( this ).html() === "Switch to Input Chart" ? $( this ).text( "Switch to Readings Chart" ) : $( this ).text( "Switch to Input Chart" );
+        $( this ).html() === "Switch to Input Chart" ? theDataType = "reading" : theDataType = "input";
+        redrawChart (theChart, theOptions);
+      });
 /*******/
-
-
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawChart);
-
     function formatDate(date) {
         var d = new Date(date),
             month = '' + (d.getMonth() + 1),
@@ -151,43 +110,30 @@ $( function() {
             hours = '' + d.getHours();
             minutes = '' + d.getMinutes();
             seconds = '' + d.getSeconds();
-
         if (month.length < 2) month = '0' + month;
         if (day.length < 2) day = '0' + day;
         if (hours.length < 2) hours = '0' + hours;
         if (minutes.length < 2) minutes = '0' + minutes;
         if (seconds.length < 2) seconds = '0' + seconds;
-
         //"yyyy-MM-dd'T'HH:mm:ssXXX"
-
         var timzeoneOffsetInt = (date.getTimezoneOffset()/60);
         //console.log("offset date: " + timzeoneOffsetInt);
-
         var d = [year, month, day].join('-') + "T" + hours + ":" + minutes + ":" + seconds + "-0" + timzeoneOffsetInt + ":00";
-
         console.log("formatted date: " + d);
-
         //2012-12-20T13:14:15-00:00
         //2018-04-03'T'00:00:00-08:00
-
         return d;
     }
-
     var theChart;
     var theOptions;
-
     function drawChart() {
-
       populateDevices();
-
       var data = new google.visualization.DataTable();
       data.addColumn('datetime', 'Time of Day');
       data.addColumn('number', 'Methane');
-
       data.addRows([
         [new Date(2015, 0, 1, 0), 5],    [new Date(2015, 0, 1, 0, 30), 5.1]
       ]);
-
       var options = {
         /*
         width: 900,
@@ -220,26 +166,17 @@ $( function() {
           }
         }
       };
-
       var chart = new google.visualization.LineChart(
         document.getElementById('chart_div'));
-
       modifyStartEndButtons(makeDateStr( subtractHoursFromDate( new Date(), 24 ) ));
-
       redrawChart(chart, options);
-
-
         $("#change").click(function(){
             redrawChart (chart, options);
         });
-
         theChart = chart;
         theOptions = options;
     }
-
-
     /****/
-
     function makeUnique(list) {
       var result = [];
       $.each(list, function(i, e) {
@@ -247,33 +184,21 @@ $( function() {
       });
       return result;
     }
-
    function populateDevices(){
-
     var $dropdown = $("#devices");
-
     var url = "http://" + urlBase + "/devices";
-
     $.getJSON( url, function( dataReturned ) {
-
         var lastElem = dataReturned[dataReturned.length-1];
-
         console.log("ajax device request returned dataReturned size: " + dataReturned.length);
-
         var deviceIds = [];
-
         for( i = 0; i < dataReturned.length; i++ ) {
             //console.log("deviceId: " + dataReturned[i].deviceId);
             deviceIds.push(dataReturned[i].deviceId);
         }
-
         //console.log("deviceIds size: " + deviceIds.length);
-
         var devIds = makeUnique(deviceIds);
-
         deviceIdsRaspPi = [];
         deviceIdsOther = [];
-
         for( i = 0; i < devIds.length; i++ ) {
             if(devIds[i].includes("RaspPi")){
                 deviceIdsRaspPi.push(devIds[i]);
@@ -285,97 +210,66 @@ $( function() {
         }
         deviceIdsOther.sort();
         deviceIdsRaspPi.sort();
-
         console.log("deviceIds post unique size: " + devIds.length);
         //console.log("devIds: " + devIds);
-
         for( i = 0; i < deviceIdsRaspPi.length; i++ ) {
             $dropdown.append($("<option />").val(deviceIdsRaspPi[i]).text(deviceIdsRaspPi[i]));
         }
         for( i = 0; i < deviceIdsOther.length; i++ ) {
             $dropdown.append($("<option />").val(deviceIdsOther[i]).text(deviceIdsOther[i]));
         }
-
     });
-
-
   }
-
       function grabDataFromServer(startDate, endDate, chart, options) {
-
         //disable all buttons until data returns
         $(':button').prop('disabled', true);
-
         var url1 = "http://" + urlBase + "/readings?gasName=methane&startDateTime=";
         var startDateStr = formatDate(startDate);
         var endDateStr = formatDate(endDate);
-
         var deviceIdStr = "";
-
         if($('#devices').find(':selected').text().length > 0){
             deviceIdStr = "&deviceId=" + $('#devices').find(':selected').text();
         }
-
         var url = url1 + startDateStr + "&endDateTime=" + endDateStr + deviceIdStr;
-
         console.log("url: " + url);
-
         $.getJSON( url, function( dataReturned ) {
-
             var lastElem = dataReturned[dataReturned.length-1];
             var firstElem = dataReturned[0];
-
             console.log("ajax request returned dataReturned size: " + dataReturned.length);
-
-
-
             data = new google.visualization.DataTable();
             data.addColumn('datetime', 'Time of Day');
             data.addColumn('number', 'Methane');
-
             console.log('Last element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2));
             console.log('First element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2));
             chart.clearChart();
-
             for( i = 0; i < dataReturned.length; i++ ) {
-
                 //console.log("instant: " + dataReturned[i].instant + " reading: " + dataReturned[i].reading);
                 //console.log("time: " + new Date(new Date(dataReturned[i].instant).setMinutes(new Date(dataReturned[i].instant).getMinutes())))
-
-                data.addRows([
-                    [new Date(new Date(dataReturned[i].instant).setMinutes(new Date(dataReturned[i].instant).getMinutes())), dataReturned[i].reading]
-                  ]);
-
+                theDataType === "reading" ?
+                    data.addRows([
+                        [new Date(new Date(dataReturned[i].instant).setMinutes(new Date(dataReturned[i].instant).getMinutes())), dataReturned[i].reading]
+                      ]) :
+                    data.addRows([
+                        [new Date(new Date(dataReturned[i].instant).setMinutes(new Date(dataReturned[i].instant).getMinutes())), dataReturned[i].input]
+                      ]);
             }
-
             chart.draw(data, options);
-
         });
-
-
         //enable all buttons until data returns
         $(':button').prop('disabled', false);
       }
-
       function redrawChart (chart, options) {
-
         var now = new Date();
-
         var startTime = new Date(makeDateStr( subtractHoursFromDate( now, 24 ) ));
-
         var endTime = now;
-
         console.log("value: " + $( "#endPicker" ).val());
-
         if($( "#endPicker" ).val() != "pick a date"){
             endTime = new Date($( "#endPicker" ).val());
         }
         if($( "#startPicker" ).val() != "pick a date"){
             startTime = new Date($( "#startPicker" ).val());
         }
-
         grabDataFromServer(startTime, endTime, chart, options);
-
       };
     /****/
 </script>
