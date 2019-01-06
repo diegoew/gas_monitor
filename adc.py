@@ -52,6 +52,7 @@ class Mcp3008(Adc):
 
     def __init__(self):
         self.spi = spidev.SpiDev()
+        self.spi.open(0, 0)
 
     def read(self, pin_num):
         """
