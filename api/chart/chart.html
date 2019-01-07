@@ -229,6 +229,9 @@ $( function() {
         var deviceIdStr = "";
         if($('#devices').find(':selected').text().length > 0){
             deviceIdStr = "&deviceId=" + $('#devices').find(':selected').text();
+        } else {
+          // due to async nature of devices array population, on first page load url variable at line 236 would get empty string insted of first device name, if not specified, hence:
+            deviceIdStr = "&deviceId=RaspPi-GasMonitor02";
         }
         var url = url1 + startDateStr + "&endDateTime=" + endDateStr + deviceIdStr;
         console.log("url: " + url);
