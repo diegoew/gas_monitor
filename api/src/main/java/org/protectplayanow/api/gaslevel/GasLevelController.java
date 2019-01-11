@@ -49,16 +49,12 @@ public class GasLevelController {
     @Autowired
     GasLevelRepo gasLevelRepo;
 
-    @ApiOperation(value = "This endpoint allows you to set or get a global value. For instance the frequency.")
+    @ApiOperation(value = "This endpoint allows you to get a global value, for instance the reading frequency.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/globalValue", method = RequestMethod.GET)
     public ResponseEntity<String> setOrGetGlobalValue(
-
-            @ApiParam(value = "use this endpoint to get and set global values")
-            @RequestParam(value = "action", defaultValue = Constants.get, required = true)
-                    String action,
 
             @ApiParam(value = "enter the value 'key' aka value 'name'")
             @RequestParam(value = "key", defaultValue = Constants.readingFrequency, required = false)
@@ -74,24 +70,60 @@ public class GasLevelController {
 
         List<Reading> readings = new ArrayList<>();
 
-        log.info("action={}, key={}, value={}", action, key, value);
+        log.info("key={}, value={}", key, value);
 
         String previousValue = globalValueMap.get( key );
 
         log.info("previousValue={}", previousValue);
 
-        if( action.equals( Constants.get ) ) {
-            value = globalValueMap.get( key );
-        } else if ( action.equals( Constants.set ) ) {
-            value = globalValueMap.put( key, value );
-        }
-
-        value = globalValueMap.get( key );
+        value = globalValueMap.get(key);
 
         HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.readingFrequency));
 
         return new ResponseEntity<String>(
-                "thanks for submitting a '" + action +
+                "thanks for submitting a get'" +
+                        "' request, the value for '" + key +
+                        "' is '" + value + "' the previous value was '" + previousValue +
+                        "'",
+                responseHeaders,
+                HttpStatus.OK);
+
+    }
+
+
+    @ApiOperation(value = "This endpoint allows you to set a global value, for instance the reading frequency.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Well done!"),
+            @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
+    @RequestMapping(value = "/globalValue", method = RequestMethod.POST)
+    public ResponseEntity<String> setGlobalValue(
+
+            @ApiParam(value = "enter the value 'key' aka value 'name'")
+            @RequestParam(value = "key", defaultValue = Constants.readingFrequency, required = false)
+            @DateTimeFormat(pattern = Constants.dateTimePattern)
+                    String key,
+
+            @ApiParam(value = "enter the new value for the key that you are sending")
+            @RequestParam(value = "value", defaultValue = Constants.readingFreq70, required = false)
+            @DateTimeFormat(pattern = Constants.dateTimePattern)
+                    String value
+
+    ) {
+
+        List<Reading> readings = new ArrayList<>();
+
+        log.info("key={}, value={}", key, value);
+
+        String previousValue = globalValueMap.get( key );
+
+        log.info("previousValue={}", previousValue);
+
+        value = globalValueMap.put(key, value);
+
+        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.readingFrequency));
+
+        return new ResponseEntity<String>(
+                "thanks for submitting a set'" +
                         "' request, the value for '" + key +
                         "' is '" + value + "' the previous value was '" + previousValue +
                         "'",
