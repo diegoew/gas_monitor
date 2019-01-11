@@ -25,7 +25,7 @@ one type of gas. Therefore, readings might be skewed by other gases.
 
 ### Monitor software
 
-`read_sensors.py`
+`monitor.py`
 - Optinally calibrates the sensors (calculates Ro values)
   * Averages 50 samples in "clean air" to calculate RO for each sensor 
 - Periodically reads sensor data from the ADC
