@@ -2,8 +2,8 @@
 
 ### Goal
 Better understand fluctuations in air pollutants arising from natural gas operations:
-- Natural gas* (a mix of gases)
-- Methane (the main component of natural gas ~ 80%–95%)
+- Natural gas (a mix of gases)
+- Methane (making up 80%–95% of natural gas)
 - CO2 (combustion output of burning natural gas)
 - CO (combustion output of burning natural gas with insufficient oxygen)
 - NOx (combustion by-product output of burning natural gas)
@@ -12,42 +12,13 @@ Better understand fluctuations in air pollutants arising from natural gas operat
 
 ### Requirements
 
-The basic setup of this air gas monitor consist of: 
-- MQ series sensors
-- ADS1115 analog-to-digital converter (ADC) - https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/ads1015-slash-ads1115
-- Raspberry Pi
-- Python program (this code) running on Raspberry Pi
-- Website to receive and display measurements
+The basic setup of this air system is:
+- A monitor made up of sensors connected to a Raspberry Pi device running client code
+- Web server to receive and display measurements
 - Cloud sharing program
 
 While the sensors react very fast, they are not exclusively sensitive to just 
 one type of gas. Therefore, readings might be skewed by other gases. 
-
-### Monitor software
-
-`monitor.py`
-- Optinally calibrates the sensors (calculates Ro values)
-  * Averages 50 samples in "clean air" to calculate RO for each sensor 
-- Periodically reads sensor data from the ADC
-- Displays the readings to standard output
-- Logs events and data to a file
-- Stores readings to a local database
-- Sends data to a server to be aggregated and displayed on the website
-
-### Installation
-
-1. Connect the Raspberry Pi:
-    - a micro-USB 5V power to port 1 
-    - a micro-USB keyboard to port 2
-    - a display device via micro-HDMI to micro-HTDMI port
-1. Connect the Raspberry Pi to the Internet
-1. Log into the Raspberry Pi and open a terminal
-1. Execute<br>`git clone https://github.com/diegoew/gas_monitor.git && cd gas_monitor && sudo pip3 install -r requirements.txt`
-1. Edit file `config.py`, at least `DEVICE_ID`, `LAT`, `LON`, `ADC_TYPE`, 
-`SENSOR_TYPES` and `OPENWEATHER_KEY`
-1. Execute<br>`sudo systemd enable --now $PWD/gas-monitor.service`
-1. Check the service log: `journalctl -u gas-monitor.service` and 
-standard output: `tail -f /var/log/messages`. 
 
 ### More info
 
