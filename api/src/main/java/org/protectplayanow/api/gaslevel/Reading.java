@@ -78,9 +78,7 @@ public class Reading {
 
         double roFromDefaultOrRecievedValue = ro;
 
-        double res = (getDeviceId().equals("RaspPi-Vlad-old-script")||getDeviceId().equals("RaspPi-Prototype-1")) ? 1023 : resolution;
-
-        double rs_over_ro = ((((res/input)-1)*loadResistance)/roFromDefaultOrRecievedValue)
+        double rs_over_ro = ((((resolution/input)-1)*loadResistance)/roFromDefaultOrRecievedValue)
                             /
                             ((.00007*(this.relativeHumidity*100)-.0158)*this.tempInCelsius + (-(.0074*this.relativeHumidity*100) + 1.7761));
 
@@ -103,7 +101,7 @@ public class Reading {
                     .longitude(this.longitude)
                     .relativeHumidity(this.relativeHumidity)
                     .tempInCelsius(this.tempInCelsius)
-                    .resolution(res)
+                    .resolution(resolution)
                     .ro(roFromDefaultOrRecievedValue)
                     .input(input)
                     .unitOfReading("ppm")
