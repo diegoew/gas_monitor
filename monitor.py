@@ -19,6 +19,8 @@ import db
 import adc as adc_
 
 
+SENSOR_INTERVAL_STR = 'reading-frequency'
+
 dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
             r' (?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})' \
             r'.[0-9]{6}' \
@@ -69,6 +71,7 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
         data['relativeHumidity'] = rel_humidity
     response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
+    return response.json()
 
 
 def upload_recorded():
@@ -77,7 +80,7 @@ def upload_recorded():
         for id_, dt, sensor_type, reading, ro, temperature, rel_humidity, _ \
                 in not_uploaded:
             try:
-                upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
+                result = upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
                 logging.error('Failed to upload measurement %s: %s', id_, e)
                 break
@@ -88,6 +91,8 @@ def upload_recorded():
                 logging.error('Failed to record the upload timestamp for'
                               ' measurement %s: %s', id_, e)
                 break
+
+            return result
 
 
 def get_ros():
@@ -126,9 +131,10 @@ def run():
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_measurement(dt, sensor_type, val, ro, temp, hum)
-                upload_recorded()
+                response = upload_recorded()
+                delay = response.get(SENSOR_INTERVAL_STR, REPEAT_DELAY_SECONDS)
 
-            sleep = REPEAT_DELAY_SECONDS + start - time.time()
+            sleep = delay
             if sleep > 0:
                 time.sleep(sleep)
 
