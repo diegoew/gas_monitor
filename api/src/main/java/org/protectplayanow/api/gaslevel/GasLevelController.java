@@ -81,10 +81,7 @@ public class GasLevelController {
         HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.readingFrequency));
 
         return new ResponseEntity<String>(
-                "thanks for submitting a get'" +
-                        "' request, the value for '" + key +
-                        "' is '" + value + "' the previous value was '" + previousValue +
-                        "'",
+                key + " = '" + value + "'",
                 responseHeaders,
                 HttpStatus.OK);
 
@@ -123,10 +120,7 @@ public class GasLevelController {
         HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.readingFrequency));
 
         return new ResponseEntity<String>(
-                "thanks for submitting a set'" +
-                        "' request, the value for '" + key +
-                        "' is '" + value + "' the previous value was '" + previousValue +
-                        "'",
+                "set " + key + " := '" + value + "'. Was '" + previousValue + "'",
                 responseHeaders,
                 HttpStatus.OK);
 
