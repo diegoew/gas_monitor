@@ -40,7 +40,7 @@ public class GasLevelController {
     private final AtomicLong counter = new AtomicLong();
     public static final ConcurrentHashMap<String, String> globalValueMap = new ConcurrentHashMap<>();
     static {
-        globalValueMap.put( Constants.sensorInterval, Constants.readingFreq70 );
+        globalValueMap.put( Constants.secondsBetweenReadings, Constants.readingFreq70 );
     }
 
     @Autowired
@@ -87,7 +87,7 @@ public class GasLevelController {
     public ResponseEntity<String> setGlobalValue(
 
             @ApiParam(value = "enter the value 'key' aka value 'name'")
-            @RequestParam(value = "key", defaultValue = Constants.sensorInterval, required = false)
+            @RequestParam(value = "key", defaultValue = Constants.secondsBetweenReadings, required = false)
             @DateTimeFormat(pattern = Constants.dateTimePattern)
                     String key,
 
@@ -122,7 +122,7 @@ public class GasLevelController {
     @RequestMapping(value = "/devices", method = RequestMethod.GET)
     public ResponseEntity<List<DeviceForRest>> getDevices(){
 
-        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.sensorInterval));
+        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.secondsBetweenReadings));
 
         return new ResponseEntity<List<DeviceForRest>>(
                 DeviceForRest.make(gasLevelRepo.getDevices()),
@@ -165,7 +165,7 @@ public class GasLevelController {
 
         log.info("gasName={}, startDateTime={}, endDateTime={}", gasName, startDateTime, endDateTime);
 
-        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.sensorInterval));
+        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.secondsBetweenReadings));
 
         return new ResponseEntity<List<Reading>>(
                 gasLevelRepo.getGasReadings(gasName, startDateTime, endDateTime, sensorName, deviceId),
@@ -243,7 +243,7 @@ public class GasLevelController {
         gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
 
         return new ResponseEntity<Void>(Constants.makeGlobalHeaders(
-                globalValueMap.get(Constants.sensorInterval)),
+                globalValueMap.get(Constants.secondsBetweenReadings)),
                 HttpStatus.OK);
 
     }
