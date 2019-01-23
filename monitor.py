@@ -134,7 +134,7 @@ def run():
                 response = upload_recorded()
                 delay = response.get(SENSOR_INTERVAL_STR, REPEAT_DELAY_SECONDS)
 
-            sleep = delay
+            sleep = float(delay) - time.time() + start
             if sleep > 0:
                 time.sleep(sleep)
 
