@@ -54,34 +54,25 @@ public class GasLevelController {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/globalValue", method = RequestMethod.GET)
-    public ResponseEntity<String> setOrGetGlobalValue(
+    public ResponseEntity<String> getGlobalValue(
 
             @ApiParam(value = "enter the value 'key' aka value 'name'")
             @RequestParam(value = "key", defaultValue = Constants.readingFrequency, required = false)
             @DateTimeFormat(pattern = Constants.dateTimePattern)
-                    String key,
-
-            @ApiParam(value = "enter the new value for the key that you are sending")
-            @RequestParam(value = "value", defaultValue = Constants.readingFreq70, required = false)
-            @DateTimeFormat(pattern = Constants.dateTimePattern)
-                    String value
+                    String key
 
     ) {
-
-        List<Reading> readings = new ArrayList<>();
-
-        log.info("key={}, value={}", key, value);
 
         String previousValue = globalValueMap.get( key );
 
         log.info("previousValue={}", previousValue);
 
-        value = globalValueMap.get(key);
+        previousValue = globalValueMap.get(key);
 
         HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(key));
 
         return new ResponseEntity<String>(
-                key + " = '" + value + "'",
+                key + " = '" + previousValue + "'",
                 responseHeaders,
                 HttpStatus.OK);
 
