@@ -58,6 +58,47 @@ public class GasLevelControllerTest {
     RestTemplate restTemplate = new RestTemplate();
 
     @Test
+    public void testGlobalValue() {
+        //GIVEN
+        String globalKey = "defaultTemp";
+        String globalVal = "21";
+
+        //WHEN
+        restTemplate.postForEntity(urlBase + port +
+                        "/globalValue?key=" + globalKey + "&value=" + globalVal,
+                null,
+                String.class);
+
+        //THEN
+        ResponseEntity<String> resp = restTemplate.getForEntity(urlBase + port +
+                        "/globalValue?key=" + globalKey,
+                String.class);
+
+        Assert.assertEquals("returned value must match", globalKey + " = '" + globalVal + "'",
+                resp.getBody());
+
+
+        //GIVEN
+        String globalKey1 = "defaultTempUnit";
+        String globalVal1 = "Celcius";
+
+        //WHEN
+        restTemplate.postForEntity(urlBase + port +
+                        "/globalValue?key=" + globalKey1 + "&value=" + globalVal1,
+                null,
+                String.class);
+
+        //THEN
+        resp = restTemplate.getForEntity(urlBase + port +
+                        "/globalValue?key=" + globalKey1,
+                String.class);
+
+
+        Assert.assertEquals("returned value must match", globalKey1 + " = '" + globalVal1 + "'",
+                resp.getBody());
+        
+    }
+    @Test
     public void testGettingDevices()  {
 
         ResponseEntity<String> forEntity = restTemplate.getForEntity(urlBase + port + "/devices", String.class);
