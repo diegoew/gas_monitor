@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta property="og:site_name" content="Protect Playa Now" />
+    <title>Gas Sensors - Protect Playa Now</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css">
+  </head>
+  <body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js"></script>
+    <p>Device <select id="devices"></select></p>
+    <p>Start <input type="text" class="datepicker" id="startPicker"></p>
+    <p>End <input type="text" class="datepicker" id="endPicker"></p>
+		  Show last
+		  <select id="timeInterval" onchange="changedTimeInterval(this.value)">
+		    <option value="1">1 hour</option>
+		    <option value="6">6 hours</option>
+		    <option value="24">24 hours</option>
+		  </select>
+		<select id="dataType">
+		  <option id="resistance" value="resistance">Raw sensor resistance</option>
+		  <option id="ppm" value="ppm">Computed PPM</option>
+		</select>
+		|
+    <button id="update" onclick="drawChart()">Update chart</button>
+    <div id="chart_div"></div>
+    <script>
+var urlBase = "localhost:8080";
+var dateType = "reading";
+var chart;
+var options;
+
+populateDevices();
+setDatePickersText(hoursAgoDate(1));
+
+function hoursAgoDate(hours) {
+  var date = new Date();
+  date.setHours(date.getHours() - hours);
+  return date;
+}
+
+function timeStr(d) {
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var s = d.getSeconds();
+  if (h < 10) h = "0" + h;
+  if (m < 10) m = "0" + h;
+  if (s < 10) s = "0" + h;
+  return h + ":" + m + ":" + s;
+}
+
+function formatDateForDisplay(d) {
+  // Example output: 04/03/2018 00:00:00
+  var year = d.getFullYear();
+  var month = 1 + d.getMonth();
+  var day = d.getDate();
+  if (month < 10) month = '0' + month;
+  if (day < 10) day = '0' + day;
+	return month + "/" + day + "/" + year + " " + timeStr(d);
+}
+
+function formatDateForServer(d) {
+  // Example output: 2018-04-03T00:00:00-08:00
+  var year = d.getFullYear();
+  var month = 1 + d.getMonth();
+  var day = d.getDate();
+  var z = d.getTimezoneOffset() / 60;
+  var a = Math.round(Math.abs(z));
+  if (month < 10) month = '0' + month;
+  if (day < 10) day = '0' + day;
+  if (a < 10) a = '0' + a;
+  var tz = (z < 0 ? '+' : '-') + a + ":00";
+  return year + "-" + month + "-"  + day + "T" + timeStr(d) + tz;  
+}
+
+$("#endPicker").datepicker({
+  onSelect: function(dateText) {
+    $('#endPicker').val(dateText + " " + timeStr(new Date()));
+  }
+});
+
+$("#startPicker").datepicker({
+  onSelect: function(dateText) {
+    $('#startPicker').val(dateText + " " + timeStr(new Date()));
+  }
+});
+
+function setDatePickersText(startTime) {
+	$("#startPicker").val(formatDateForDisplay(startTime));
+	$("#endPicker").val(formatDateForDisplay(new Date()));
+}
+
+function changedTimeInterval(hours) {
+	setDatePickersText(hoursAgoDate(hours));
+}
+
+function populateDevices() {
+  var $dropdown = $("#devices");
+  var url = "http://" + urlBase + "/devices?ids=true";
+  $.getJSON(url, function(devIds) {
+    var idsRaspPi = [];
+    var idsOther = [];
+    for (i = 0; i < devIds.length; i++) {
+      if (devIds[i].startsWith("RaspPi")) {
+        idsRaspPi.push(devIds[i]);
+      } else if (!devIds[i].startsWith("zTest")) {
+        idsOther.push(devIds[i]);
+      }
+    }
+    for (i = 0; i < idsRaspPi.length; i++) {
+      $dropdown.append($("<option />").val(idsRaspPi[i]).text(idsRaspPi[i]));
+    }
+    for (i = 0; i < idsOther.length; i++) {
+      $dropdown.append($("<option />").val(idsOther[i]).text(idsOther[i]));
+    }
+  });
+}
+
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(setUpAndDrawChart);
+
+function setUpAndDrawChart() {
+  var data = new google.visualization.DataTable();
+  data.addColumn('datetime', 'Time of Day');
+  data.addColumn('number', 'Combustibles');
+  data.addRows([
+    [new Date(2015, 0, 1, 0), 5],
+    [new Date(2015, 0, 1, 0, 30), 5.1]
+  ]);
+  options = {
+    /*
+    width: 900,
+    height: 500,
+    legend: {position: 'none'},
+    */
+    chartArea: {
+      width: '75%',
+      height: '75%'
+    },
+    enableInteractivity: true,
+    vAxis: {
+      title: 'Parts per million'
+    },
+    hAxis: {
+      /*
+      viewWindow: {
+        min: new Date(2014, 11, 31, 18),
+        max: new Date(2015, 0, 3, 1)
+      },
+      */
+      gridlines: {
+        count: -1,
+        units: {
+          days: {format: ['MMM dd']},
+          hours: {format: ['HH:mm', 'ha']},
+        }
+      },
+      minorGridlines: {
+        units: {
+          hours: {format: ['hh:mm:ss a', 'ha']},
+          minutes: {format: ['HH:mm a Z', ':mm']}
+        }
+      }
+    }
+  };
+  chart = new google.visualization.LineChart($('#chart_div')[0]);
+  drawChart();
+}
+
+function drawChart() {
+  var dev = $('#devices option:selected').text();
+  var start = new Date($("#startPicker").val());
+  var end = new Date($("#endPicker").val());
+  var deviceIdParam = dev.length > 0 ? "&deviceId=" + dev : "";
+  var startDateParam = "&startDateTime=" + formatDateForServer(start);
+  var endDateParam = "&endDateTime=" +  formatDateForServer(end);
+  var url = "http://" + urlBase + "/readings?gasName=methane" + deviceIdParam + startDateParam + endDateParam;
+  console.log("url: " + url);
+  // Disable controls until data returns
+  $('select,button').prop('disabled', true);
+  $.getJSON(url, function(data) {
+    console.log("Received data size: " + data.length);
+    table = new google.visualization.DataTable();
+    table.addColumn('datetime', 'Time of Day');
+    table.addColumn('number', 'Combustibles');
+    chart.clearChart();
+    var x;
+    for (i = 0; i < data.length; i++) {
+      x = data[i];
+      table.addRows([
+        [
+          new Date(x.instant),
+          $('#dataType').val() == "resistance" ? x.reading : x.input
+        ]
+      ]);
+    }
+    chart.draw(table, options);
+    // Enable conrols
+    $('select,button').prop('disabled', false);
+  });
+};
+    </script>
+  </body>
+</html>
