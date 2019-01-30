@@ -11,12 +11,12 @@ import sys
 import time
 
 import requests
-import openweather
 
+import adc as adc_
 from config import DEFAULT_SECONDS_BETWEEN_READINGS, SERVER_URL, DEVICE_ID, \
     LAT, LON, SENSOR_TYPES, ADC_TYPE
 import db
-import adc as adc_
+import openweather
 
 
 SECONDS_BETWEEN_READINGS_JSON_KEY = 'secondsBetweenReadings'
