@@ -13,11 +13,11 @@ WEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 WEATHER_RETRIEVAL_INTERVAL_SECONDS = 60
 
 REPEAT_DELAY_SECONDS = 60
-DB = 'measurements.sqlite'
+DB = 'readings.sqlite'
 SERVER_URL = 'http://34.223.248.143/readings/calculate'
 
 import logging
-logging.basicConfig(filename="measurements.log",
+logging.basicConfig(filename="readings.log",
                     format='%(asctime)-15s %(message)s',
                     level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler())

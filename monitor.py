@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Script to periodically read gas concentration measurements from sensors,
-record them to a local database and upload them to a Web service.
+Periodically reads gas concentration from sensors, stores the values in a local
+database and uploads them to the Web service.
 """
 import argparse
 from datetime import datetime, timezone
@@ -73,20 +73,20 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
 
 def upload_recorded():
         not_uploaded = db.get_not_uploaded()
-        # Upload each measurement and record its upload timestamp
+        # Upload each reading and record its upload timestamp
         for id_, dt, sensor_type, reading, ro, temperature, rel_humidity, _ \
                 in not_uploaded:
             try:
                 upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
-                logging.error('Failed to upload measurement %s: %s', id_, e)
+                logging.error('Failed to upload reading #%s: %s', id_, e)
                 break
 
             try:
                 db.record_uploaded_time(id_)
             except Exception as e:
                 logging.error('Failed to record the upload timestamp for'
-                              ' measurement %s: %s', id_, e)
+                              ' reading #%s: %s', id_, e)
                 break
 
 
@@ -125,7 +125,7 @@ def run():
                 sys.stdout.write('%s=%g ' % (sensor_type, val))
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
-                db.store_measurement(dt, sensor_type, val, ro, temp, hum)
+                db.store_reading(dt, sensor_type, val, ro, temp, hum)
                 upload_recorded()
 
             sleep = REPEAT_DELAY_SECONDS + start - time.time()

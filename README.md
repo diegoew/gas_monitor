@@ -17,7 +17,7 @@ The basic setup of this air gas monitor consist of:
 - ADS1115 analog-to-digital converter (ADC) - https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/ads1015-slash-ads1115
 - Raspberry Pi
 - Python program (this code) running on Raspberry Pi
-- Website to receive and display measurements
+- Website to receive and display concentrations
 - Cloud sharing program
 
 While the sensors react very fast, they are not exclusively sensitive to just 
