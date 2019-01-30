@@ -42,7 +42,7 @@ public class Constants {
             get = "get",
             set = "set",
 
-            readingFrequency = "reading-frequency",
+            secondsBetweenReadings = "secondsBetweenReadings",
             readingFreq70 = "60",
 
             //for param "sensorType",
@@ -95,12 +95,12 @@ public class Constants {
                     ;
 
 
-    public static HttpHeaders makeGlobalHeaders(String readingFrequency){
+    public static HttpHeaders makeGlobalHeaders(String secondsBetweenReadings){
 
         HttpHeaders responseHeaders = new HttpHeaders();
 
         responseHeaders.set("Access-Control-Allow-Origin", "*");
-        responseHeaders.set(Constants.readingFrequency, readingFrequency);
+        responseHeaders.set(Constants.secondsBetweenReadings, secondsBetweenReadings);
 
         return responseHeaders;
 
