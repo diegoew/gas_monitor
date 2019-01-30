@@ -16,3 +16,6 @@ venv
 
 # SQLite DB
 *.sqlite
+
+# Directory with miscellaneous local files
+notes/
