@@ -138,7 +138,6 @@ def run():
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    global adc
     adc = adc_.create(ADC_TYPE)
 
     if args.calibrate:
