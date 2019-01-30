@@ -19,7 +19,7 @@ import db
 import adc as adc_
 
 
-SENSOR_INTERVAL_STR = 'reading-frequency'
+SENSOR_INTERVAL_STR = 'secondsBetweenReadings'
 
 dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
             r' (?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})' \
