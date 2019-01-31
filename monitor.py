@@ -13,13 +13,13 @@ import time
 import requests
 import openweather
 
-from config import REPEAT_DELAY_SECONDS, SERVER_URL, DEVICE_ID, LAT, LON, \
-    SENSOR_TYPES, ADC_TYPE
+from config import DEFAULT_SECONDS_BETWEEN_READINGS, SERVER_URL, DEVICE_ID, \
+    LAT, LON, SENSOR_TYPES, ADC_TYPE
 import db
 import adc as adc_
 
 
-SENSOR_INTERVAL_STR = 'secondsBetweenReadings'
+SECONDS_BETWEEN_READINGS_JSON_KEY = 'secondsBetweenReadings'
 
 dt_format = r'(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})' \
             r' (?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})' \
@@ -119,7 +119,8 @@ def run():
 
         ros = get_ros()
 
-        logging.info('\nRead sensors every %s seconds...' % REPEAT_DELAY_SECONDS)
+        logging.info('\nRead sensors every %s seconds...'
+                     % DEFAULT_SECONDS_BETWEEN_READINGS)
         while True:
             start = time.time()
 
@@ -132,7 +133,8 @@ def run():
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_measurement(dt, sensor_type, val, ro, temp, hum)
                 response = upload_recorded()
-                delay = response.get(SENSOR_INTERVAL_STR, REPEAT_DELAY_SECONDS)
+                delay = response.get(SECONDS_BETWEEN_READINGS_JSON_KEY,
+                                     DEFAULT_SECONDS_BETWEEN_READINGS)
 
             sleep = float(delay) - time.time() + start
             if sleep > 0:
