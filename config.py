@@ -12,7 +12,7 @@ OPENWEATHER_KEY =  #'177f943c86860b2efb332b00962ac509'
 WEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 WEATHER_RETRIEVAL_INTERVAL_SECONDS = 60
 
-REPEAT_DELAY_SECONDS = 60
+DEFAULT_SECONDS_BETWEEN_READINGS = 60
 DB = 'measurements.sqlite'
 SERVER_URL = 'http://34.223.248.143/readings/calculate'
 
