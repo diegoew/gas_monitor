@@ -6,7 +6,7 @@ import sqlite3
 from config import DB
 
 
-DB_TABLE = 'measurements'
+DB_TABLE = 'readings'
 
 connection = None
 
@@ -30,7 +30,7 @@ def init():
     if not os.path.isfile(DB):
         cursor = get_connection().cursor()
         cursor.executescript('''
-        CREATE TABLE measurements(
+        CREATE TABLE readings(
             id INTEGER NOT NULL PRIMARY KEY,
             ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             sensor VARCHAR(8),
@@ -48,7 +48,7 @@ def init():
         );''')
 
 
-def store_measurement(ts, sensor_type, reading, ro, temperature=None,
+def store_reading(ts, sensor_type, reading, ro, temperature=None,
                       rel_humidity=None, upload_ts=None):
     cursor = get_connection().cursor()
     try:
@@ -60,19 +60,19 @@ def store_measurement(ts, sensor_type, reading, ro, temperature=None,
              upload_ts))
         get_connection().commit()
     except Exception as e:
-        logging.error('Failed to record measurement into DB: %s', e)
+        logging.error('Failed to record reading into DB: %s', e)
 
 
 def get_not_uploaded():
-    """Get all recorded measurements that were not uploaded"""
+    """Get all recorded readings that were not uploaded"""
     cursor = get_connection().cursor()
-    # Get all recorded measurements that were not uploaded
+    # Get all recorded readings that were not uploaded
     try:
         cursor.execute('SELECT * FROM %s' % DB_TABLE
                        + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
         return cursor.fetchall()
     except Exception as e:
-        logging.error('Failed to get recorded measurements: %s', e)
+        logging.error('Failed to get recorded readings: %s', e)
         return
 
 
