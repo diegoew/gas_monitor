@@ -192,7 +192,7 @@ $( function() {
         console.log("ajax device request returned dataReturned size: " + dataReturned.length);
         var deviceIds = [];
         for( i = 0; i < dataReturned.length; i++ ) {
-            //console.log("deviceId: " + dataReturned[i].deviceId);
+            // console.log("deviceId: " + dataReturned[i].deviceId);
             deviceIds.push(dataReturned[i].deviceId);
         }
         //console.log("deviceIds size: " + deviceIds.length);
@@ -218,6 +218,7 @@ $( function() {
         for( i = 0; i < deviceIdsOther.length; i++ ) {
             $dropdown.append($("<option />").val(deviceIdsOther[i]).text(deviceIdsOther[i]));
         }
+        redrawChart (theChart, theOptions);
     });
   }
       function grabDataFromServer(startDate, endDate, chart, options) {
@@ -227,11 +228,11 @@ $( function() {
         var startDateStr = formatDate(startDate);
         var endDateStr = formatDate(endDate);
         var deviceIdStr = "";
-        if($('#devices').find(':selected').text().length > 0){
+        if($('#devices option:selected').text().length > 0){
             deviceIdStr = "&deviceId=" + $('#devices').find(':selected').text();
         } else {
-          // due to async nature of devices array population, on first page load url variable at line 236 would get empty string insted of first device name, if not specified, hence:
-            deviceIdStr = "&deviceId=RaspPi-GasMonitor02";
+          // forcing the function to wait for populateDevices to finish, before starting to draw
+          return;
         }
         var url = url1 + startDateStr + "&endDateTime=" + endDateStr + deviceIdStr;
         console.log("url: " + url);
