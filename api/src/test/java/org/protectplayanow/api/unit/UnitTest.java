@@ -81,7 +81,7 @@ public class UnitTest {
 
         //GIVEN a reading ...
         List<Reading> readings = Reading.builder()
-                .deviceId(Constants.diegosDeviceId+"k")                 //... from a new device
+                .deviceId(Constants.PleaseSendDeviceIdNextTime+"k")                 //... from a new device
                 .instant(new Date())
                 .latitude(Double.parseDouble(Constants.latitudePdr))
                 .longitude(Double.parseDouble(Constants.latitudePdr))
@@ -102,32 +102,6 @@ public class UnitTest {
                 //THEN we expect this result
                 Assert.assertEquals("check calculation",
                         new BigDecimal("12.19").setScale(2,BigDecimal.ROUND_HALF_UP),
-                        new BigDecimal(r.getReading()).setScale(2,BigDecimal.ROUND_HALF_UP));
-            }
-        });
-
-        //GIVEN a reading ...
-        readings = Reading.builder()
-                .deviceId(Constants.diegosDeviceId)                     //... from an old device
-                .instant(new Date())
-                .latitude(Double.parseDouble(Constants.latitudePdr))
-                .longitude(Double.parseDouble(Constants.latitudePdr))
-                .reading(10)                                           //... with this value and NO resolution sent
-                .sensorType(Constants.mq9)
-                .ro(55)
-                .tempInCelsius(20)
-                .relativeHumidity(.10)
-                .build()
-                .makeReadingsWithCalculation();     //WHEN we calculte
-
-        readings.stream().forEach( r -> {
-            if(r.getGasName().equals(Constants.Methane) && r.getSensorType().equals(Constants.mq9)){
-
-                log.info("calculated reading: {}", r);
-
-                //THEN we expect this result
-                Assert.assertEquals("calculated reading should match",
-                        new BigDecimal("1.06").setScale(2,BigDecimal.ROUND_HALF_UP),
                         new BigDecimal(r.getReading()).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
         });
