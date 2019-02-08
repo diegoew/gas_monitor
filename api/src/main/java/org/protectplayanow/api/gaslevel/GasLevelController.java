@@ -40,7 +40,7 @@ public class GasLevelController {
     private final AtomicLong counter = new AtomicLong();
     public static final ConcurrentHashMap<String, String> globalValueMap = new ConcurrentHashMap<>();
     static {
-        globalValueMap.put( Constants.secondsBetweenReadings, Constants.readingFreq70 );
+        globalValueMap.put( Constants.secondsBetweenReadings, Constants.secondsBetweenReadingsDefaultValue);
     }
 
     @Autowired
@@ -57,7 +57,7 @@ public class GasLevelController {
     public ResponseEntity<String> getGlobalValue(
 
             @ApiParam(value = "enter the value 'key' aka value 'name'")
-            @RequestParam(value = "key", defaultValue = Constants.readingFrequency, required = false)
+            @RequestParam(value = "key", defaultValue = Constants.secondsBetweenReadings, required = false)
             @DateTimeFormat(pattern = Constants.dateTimePattern)
                     String key
 
@@ -92,7 +92,7 @@ public class GasLevelController {
                     String key,
 
             @ApiParam(value = "enter the new value for the key that you are sending")
-            @RequestParam(value = "value", defaultValue = Constants.readingFreq70, required = false)
+            @RequestParam(value = "value", defaultValue = Constants.secondsBetweenReadingsDefaultValue, required = false)
             @DateTimeFormat(pattern = Constants.dateTimePattern)
                     String value
 
@@ -156,7 +156,7 @@ public class GasLevelController {
                     String sensorName,
 
             @ApiParam(value = "deviceId")
-            @RequestParam(value = "deviceId", defaultValue = Constants.diegosDeviceId, required = false)
+            @RequestParam(value = "deviceId", defaultValue = Constants.PleaseSendDeviceIdNextTime, required = false)
                     String deviceId
 
             ) {

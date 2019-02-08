@@ -34,16 +34,8 @@ public class Constants {
             toluene = "toluene",
             acetone = "acetone",
 
-            diegosDeviceId = "RaspPi-Prototype-1",
-            vladsDeviceId = "RaspPi-Vlad-old-script",
-
-            resolution = "32767",
-
-            get = "get",
-            set = "set",
-
             secondsBetweenReadings = "secondsBetweenReadings",
-            readingFreq70 = "60",
+            secondsBetweenReadingsDefaultValue = "60",
 
             //for param "sensorType",
             mq2 = "MQ-2",

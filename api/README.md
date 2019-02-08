@@ -20,7 +20,9 @@ The response must have '1.8.' in it. If not download the java 8 jdk from the lin
 
 ## Configure MySql Database connection
 
-(Need to add info on which property files to update)
+Run a local mysql instance using the schema file in /api/database/schema_create.sql
+
+Modify add local mysql path, username, password in file: /api/src/main/resources/application.properties
 
 ## Leverage Gradle to run the application locally (SECTION BELOW IS A PLACEHOLDER, bootRun command needs to be added)
 
@@ -36,3 +38,8 @@ Look for the second to last line in the console logs for the port. The line will
 
 2016-11-09 23:55:54.339  INFO 68013 --- [           main] s.b.c.e.t.TomcatEmbeddedServletContainer : Tomcat started on port(s): 8080 (http)
 
+### To Run Tests
+
+$ ./gradlew clean build
+
+If there are errors look at the console output. Gradle will generate and html file with error information.
