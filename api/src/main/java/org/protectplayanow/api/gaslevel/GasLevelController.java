@@ -106,7 +106,7 @@ public class GasLevelController {
 
         log.info("previousValue={}", previousValue);
 
-        value = globalValueMap.put(key, value);
+        globalValueMap.put(key, value);
 
         return new ResponseEntity<String>(
                 "set " + key + " := '" + value + "'. Was '" + previousValue + "'",
