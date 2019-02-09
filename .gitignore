@@ -17,5 +17,10 @@ venv
 # SQLite DB
 *.sqlite
 
+# Build directories
+.gradle
+build/
+
 # Directory with miscellaneous local files
 notes/
+
