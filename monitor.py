@@ -71,7 +71,7 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
         data['relativeHumidity'] = rel_humidity
     response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
-    return response.json()
+    return response.headers.get(SECONDS_BETWEEN_READINGS_JSON_KEY)
 
 
 def upload_recorded():
@@ -91,7 +91,6 @@ def upload_recorded():
                 logging.error('Failed to record the upload timestamp for'
                               ' reading #%s: %s', id_, e)
                 break
-
             return result
 
 
@@ -119,8 +118,8 @@ def run():
 
         ros = get_ros()
 
-        logging.info('\nRead sensors every %s seconds...'
-                     % DEFAULT_SECONDS_BETWEEN_READINGS)
+        delay = DEFAULT_SECONDS_BETWEEN_READINGS
+        logging.info('\nRead sensors every %s seconds...' % delay)
         while True:
             start = time.time()
 
@@ -132,11 +131,14 @@ def run():
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_reading(dt, sensor_type, val, ro, temp, hum)
-                response = upload_recorded()
-                delay = response.get(SECONDS_BETWEEN_READINGS_JSON_KEY,
-                                     DEFAULT_SECONDS_BETWEEN_READINGS)
+                delay = upload_recorded()
 
-            sleep = float(delay) - time.time() + start
+            try:
+                delay = float(delay)
+            except Exception as e:
+                delay = DEFAULT_SECONDS_BETWEEN_READINGS
+                logging.error('Cannot parse delay: %s. Use %s' % (e, delay))
+            sleep = delay - time.time() + start
             if sleep > 0:
                 time.sleep(sleep)
 
