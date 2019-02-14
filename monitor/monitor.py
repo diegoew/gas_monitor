@@ -113,8 +113,6 @@ def run():
     db.init()
 
     try:
-        logging.info('\nPress Ctrl+C to stop')
-
         ros = get_ros()
 
         delay = DEFAULT_SECONDS_BETWEEN_READINGS
@@ -125,8 +123,7 @@ def run():
             for pin_num, (sensor_type, ro) in enumerate(zip(SENSOR_TYPES, ros)):
                 val = adc.read(pin_num)
                 dt = datetime.now(timezone.utc).astimezone()
-                sys.stdout.write('%s=%g ' % (sensor_type, val))
-                sys.stdout.flush()
+                logging.info('%s=%g ' % (sensor_type, val))
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_reading(dt, sensor_type, val, ro, temp, hum)
                 delay = upload_recorded()
@@ -142,7 +139,6 @@ def run():
                 time.sleep(sleep)
 
     except KeyboardInterrupt:
-        logging.info('Stopped by user')
         db.close_connection()
 
 if __name__ == '__main__':
