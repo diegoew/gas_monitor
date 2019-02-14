@@ -75,12 +75,13 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
 
 
 def upload_recorded():
+        delay = None
         not_uploaded = db.get_not_uploaded()
         # Upload each reading and record its upload timestamp
         for id_, dt, sensor_type, reading, ro, temperature, rel_humidity, _ \
                 in not_uploaded:
             try:
-                result = upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
+                delay = upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
                 logging.error('Failed to upload reading #%s: %s', id_, e)
                 break
@@ -91,7 +92,7 @@ def upload_recorded():
                 logging.error('Failed to record the upload timestamp for'
                               ' reading #%s: %s', id_, e)
                 break
-            return result
+        return delay
 
 
 def get_ros():
@@ -119,7 +120,6 @@ def run():
         ros = get_ros()
 
         delay = DEFAULT_SECONDS_BETWEEN_READINGS
-        logging.info('\nRead sensors every %s seconds...' % delay)
         while True:
             start = time.time()
 
@@ -135,9 +135,10 @@ def run():
 
             try:
                 delay = float(delay)
-            except Exception as e:
+            except (TypeError, ValueError) as e:
                 delay = DEFAULT_SECONDS_BETWEEN_READINGS
-                logging.error('Cannot parse delay: %s. Use %s' % (e, delay))
+                logging.error('Cannot parse delay: %s' % e)
+            logging.info('\nWait %s seconds...' % delay)
             sleep = delay - time.time() + start
             if sleep > 0:
                 time.sleep(sleep)
