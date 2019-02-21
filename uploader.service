@@ -1,0 +1,10 @@
+[Unit]
+Description=Uploads gas readings recorded by gas-monitor
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/gas_monitor/uploader.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -29,18 +29,20 @@ def close_connection():
 def init():
     if not os.path.isfile(DB):
         cursor = get_connection().cursor()
-        cursor.executescript('''
-        CREATE TABLE readings(
-            id INTEGER NOT NULL PRIMARY KEY,
+        cursor.execute('''
+        CREATE TABLE %s (
             ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             sensor VARCHAR(8),
             reading FLOAT,
             ro FLOAT NULL,
+            resolution FLOAT NOT NULL,
             temperature FLOAT NULL,
-            rel_humidity FLOAT NULL,
-            upload_ts TIMESTAMP NULL
-        );
-        CREATE TABLE ros(
+            humidity FLOAT NULL,
+            upload_ts TIMESTAMP NULL,
+            PRIMARY KEY (ts, sensor)
+        );''' % DB_TABLE)
+        cursor.execute('''
+        CREATE TABLE ros (
             id INTEGER NOT NULL PRIMARY KEY,
             ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             sensor VARCHAR(8),
@@ -48,15 +50,14 @@ def init():
         );''')
 
 
-def store_reading(ts, sensor_type, reading, ro, temperature=None,
-                      rel_humidity=None, upload_ts=None):
+def store_reading(ts, sensor_type, reading, ro, resolution, temperature=None, humidity=None,
+                  upload_ts=None):
     cursor = get_connection().cursor()
     try:
         cursor.execute(
             'INSERT INTO %s' % DB_TABLE
-            + '(ts, sensor, reading, ro, temperature, rel_humidity, upload_ts)'
-            + ' VALUES (?, ?, ?, ?, ?, ?, ?);',
-            (ts, sensor_type, reading, ro, temperature, rel_humidity,
+            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?);',
+            (ts, sensor_type, reading, resolution, ro, temperature, humidity,
              upload_ts))
         get_connection().commit()
     except Exception as e:
@@ -69,19 +70,19 @@ def get_not_uploaded():
     # Get all recorded readings that were not uploaded
     try:
         cursor.execute('SELECT * FROM %s' % DB_TABLE
-                       + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
+                       + '  WHERE upload_ts IS NULL ORDER BY ts DESC;')
         return cursor.fetchall()
     except Exception as e:
         logging.error('Failed to get recorded readings: %s', e)
         return
 
 
-def record_uploaded_time(id_):
+def record_uploaded_time(ts, sensor):
     """Record uploaded time. Throws exceptions on error."""
     cursor = get_connection().cursor()
     cursor.execute('UPDATE %s' % DB_TABLE
-                   + ' SET upload_ts = ? WHERE id = ?;',
-                   (datetime.now(), id_))
+                   + ' SET upload_ts = ? WHERE ts = ? AND sensor = ?;',
+                   (datetime.now(), ts, sensor))
     get_connection().commit()
 
 

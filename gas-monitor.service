@@ -1,5 +1,5 @@
 [Unit]
-Description=Gas monitor service
+Description=Reads gas concentrations and records to a DB
 
 [Service]
 Type=idle

@@ -45,7 +45,7 @@ one type of gas. Therefore, readings might be skewed by other gases.
 1. Execute<br>`git clone https://github.com/diegoew/gas_monitor.git && cd gas_monitor && sudo pip3 install -r requirements.txt`
 1. Edit file `config.py`, at least `DEVICE_ID`, `LAT`, `LON`, `ADC_TYPE`, 
 `SENSOR_TYPES` and `OPENWEATHER_KEY`
-1. Execute<br>`sudo systemd enable --now $PWD/gas-monitor.service`
+1. Execute<br>`sudo systemd enable --now $PWD/gas-monitor.service $PWD/uploader.service`
 1. Check the service log: `journalctl -u gas-monitor.service` and 
 standard output: `tail -f /var/log/messages`. 
 
