@@ -84,14 +84,12 @@ def upload_recorded():
                 delay = upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
                 logging.error('Failed to upload reading #%s: %s', id_, e)
-                break
 
             try:
                 db.record_uploaded_time(id_)
             except Exception as e:
                 logging.error('Failed to record the upload timestamp for'
                               ' reading #%s: %s', id_, e)
-                break
         return delay
 
 
