@@ -71,28 +71,26 @@ def upload(dt, sensor_type, reading, ro=None, temperature=None,
         data['relativeHumidity'] = rel_humidity
     response = requests.post(SERVER_URL, data=data)
     response.raise_for_status()
-    return response.json()
+    return response.headers.get(SECONDS_BETWEEN_READINGS_JSON_KEY)
 
 
 def upload_recorded():
+        delay = None
         not_uploaded = db.get_not_uploaded()
         # Upload each reading and record its upload timestamp
         for id_, dt, sensor_type, reading, ro, temperature, rel_humidity, _ \
                 in not_uploaded:
             try:
-                result = upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
+                delay = upload(dt, sensor_type, reading, ro, temperature, rel_humidity)
             except Exception as e:
                 logging.error('Failed to upload reading #%s: %s', id_, e)
-                break
 
             try:
                 db.record_uploaded_time(id_)
             except Exception as e:
                 logging.error('Failed to record the upload timestamp for'
                               ' reading #%s: %s', id_, e)
-                break
-
-            return result
+        return delay
 
 
 def get_ros():
@@ -119,8 +117,7 @@ def run():
 
         ros = get_ros()
 
-        logging.info('\nRead sensors every %s seconds...'
-                     % DEFAULT_SECONDS_BETWEEN_READINGS)
+        delay = DEFAULT_SECONDS_BETWEEN_READINGS
         while True:
             start = time.time()
 
@@ -132,11 +129,15 @@ def run():
                 sys.stdout.flush()
                 temp, hum = openweather.get_temperature_and_rel_humidity()
                 db.store_reading(dt, sensor_type, val, ro, temp, hum)
-                response = upload_recorded()
-                delay = response.get(SECONDS_BETWEEN_READINGS_JSON_KEY,
-                                     DEFAULT_SECONDS_BETWEEN_READINGS)
+                delay = upload_recorded()
 
-            sleep = float(delay) - time.time() + start
+            try:
+                delay = float(delay)
+            except (TypeError, ValueError) as e:
+                delay = DEFAULT_SECONDS_BETWEEN_READINGS
+                logging.error('Cannot parse delay: %s' % e)
+            logging.info('\nWait %s seconds...' % delay)
+            sleep = delay - time.time() + start
             if sleep > 0:
                 time.sleep(sleep)
 
