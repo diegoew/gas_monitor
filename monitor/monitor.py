@@ -133,7 +133,7 @@ def run():
             except (TypeError, ValueError) as e:
                 delay = DEFAULT_SECONDS_BETWEEN_READINGS
                 logging.error('Cannot parse delay: %s' % e)
-            logging.info('\nWait %s seconds...' % delay)
+            logging.info('Wait %s seconds...' % delay)
             sleep = delay - time.time() + start
             if sleep > 0:
                 time.sleep(sleep)
