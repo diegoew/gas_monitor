@@ -3,11 +3,9 @@ import logging
 import os
 import sqlite3
 
-from config import DB
 
-
-DB_TABLE = 'readings'
-
+DB = 'readings.sqlite'
+TABLE = 'readings'
 connection = None
 
 
@@ -49,11 +47,11 @@ def init():
 
 
 def store_reading(ts, sensor_type, reading, ro, temperature=None,
-                      rel_humidity=None, upload_ts=None):
+                  rel_humidity=None, upload_ts=None):
     cursor = get_connection().cursor()
     try:
         cursor.execute(
-            'INSERT INTO %s' % DB_TABLE
+            'INSERT INTO %s' % TABLE
             + '(ts, sensor, reading, ro, temperature, rel_humidity, upload_ts)'
             + ' VALUES (?, ?, ?, ?, ?, ?, ?);',
             (ts, sensor_type, reading, ro, temperature, rel_humidity,
@@ -68,7 +66,7 @@ def get_not_uploaded():
     cursor = get_connection().cursor()
     # Get all recorded readings that were not uploaded
     try:
-        cursor.execute('SELECT * FROM %s' % DB_TABLE
+        cursor.execute('SELECT * FROM %s' % TABLE
                        + '  WHERE upload_ts IS NULL ORDER BY ts ASC;')
         return cursor.fetchall()
     except Exception as e:
@@ -79,7 +77,7 @@ def get_not_uploaded():
 def record_uploaded_time(id_):
     """Record uploaded time. Throws exceptions on error."""
     cursor = get_connection().cursor()
-    cursor.execute('UPDATE %s' % DB_TABLE
+    cursor.execute('UPDATE %s' % TABLE
                    + ' SET upload_ts = ? WHERE id = ?;',
                    (datetime.now(), id_))
     get_connection().commit()
