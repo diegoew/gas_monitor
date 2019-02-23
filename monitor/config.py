@@ -21,6 +21,5 @@ import logging
 import os
 os.chdir(os.path.dirname(inspect.getfile(inspect.currentframe())))
 logging.basicConfig(handlers=[logging.StreamHandler()],
-                    format='%(asctime)-15s %(message)s',
+                    format='%(levelname)s %(message)s',
                     level=logging.INFO)
-logging.getLogger().addHandler(logging.StreamHandler())
