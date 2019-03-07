@@ -23,6 +23,8 @@
     <script>
     var urlBase = "34.223.248.143"; //urlBase = "localhost:8080";
     var theDataType = "reading";
+    var yAxisPPMLabel = 'Parts Per Million';
+    var yAxisInputLabel = 'Sensor Input Values';
 /*******/
 $( function() {
     $( "#startPicker" ).datepicker({
@@ -143,7 +145,7 @@ $( function() {
         },
         enableInteractivity: true,
         vAxis: {
-          title: 'Parts Per Million'
+          title: yAxisPPMLabel
         },
         hAxis: {
           /* viewWindow: {
@@ -215,6 +217,11 @@ function populateDevices() {
             console.log("ajax request returned dataReturned size: " + dataReturned.length);
             data = new google.visualization.DataTable();
             data.addColumn('datetime', 'Time of Day');
+
+            theDataType === "reading" ?
+                    options.vAxis.title = yAxisPPMLabel :
+                    options.vAxis.title = yAxisInputLabel ;
+
             data.addColumn('number', 'Methane');
             console.log('Last element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2));
             console.log('First element from array that came back from server: ' +  JSON.stringify(lastElem, null, 2));

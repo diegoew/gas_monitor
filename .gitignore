@@ -24,3 +24,5 @@ build/
 # Directory with miscellaneous local files
 notes/
 
+api/chart/page1.html
+api/chart/page2.html
