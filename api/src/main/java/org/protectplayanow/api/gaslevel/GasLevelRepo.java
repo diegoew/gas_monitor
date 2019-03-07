@@ -16,4 +16,5 @@ public interface GasLevelRepo {
 
     List<Device> getDevices();
 
+    List<String> getDeviceIds();
 }

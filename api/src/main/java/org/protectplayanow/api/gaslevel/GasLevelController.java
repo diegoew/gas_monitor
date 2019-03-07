@@ -114,21 +114,24 @@ public class GasLevelController {
 
     }
 
-
     @ApiOperation(value = "This endpoint allows you to get a list of unique deviceIds, sensorType, latidude, longitude.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Well done!"),
             @ApiResponse(code = 500, message = "Server error a.k.a. royal screwup!")})
     @RequestMapping(value = "/devices", method = RequestMethod.GET)
-    public ResponseEntity<List<DeviceForRest>> getDevices(){
-
-        HttpHeaders responseHeaders = Constants.makeGlobalHeaders(globalValueMap.get(Constants.secondsBetweenReadings));
-
-        return new ResponseEntity<List<DeviceForRest>>(
-                DeviceForRest.make(gasLevelRepo.getDevices()),
-                responseHeaders,
+    public ResponseEntity<List> getDevices(
+            @ApiParam(value = Constants.apiIdsMessage)
+            @RequestParam(value = "ids", defaultValue = "false", required = false) boolean shouldIncludeIds
+    ) {
+        if (shouldIncludeIds) {
+            return new ResponseEntity<List>(
+                gasLevelRepo.getDeviceIds(),
                 HttpStatus.OK);
-
+        } else {
+            return new ResponseEntity<List>(
+                DeviceForRest.make(gasLevelRepo.getDevices()),
+                HttpStatus.OK);
+        }
     }
 
     @ApiResponses(value = {

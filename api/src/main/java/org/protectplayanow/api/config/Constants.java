@@ -72,6 +72,12 @@ public class Constants {
             apiGasMessage = "pass in strings " + Constants.gasKeys + ", or other gas names that sensors have reported"
             ;
 
+    public static final String
+        apiIdsMessage = "pass in string true to get a list of only device IDs" 
+            ;
+
+    public static final String
+        apiRemoveIfIdStartsWithMessage = "Remove results whose device ID starts with this string";
 
     public static final String
             sensorTypeMsg = "must have value " + sensorTypeList;;

@@ -23,7 +23,6 @@
     <script>
     var urlBase = "34.223.248.143";
     var theDataType = "reading";
-    <!--var urlBase = "localhost:8080";-->
 /*******/
 $( function() {
     $( "#startPicker" ).datepicker({
@@ -176,50 +175,28 @@ $( function() {
         theChart = chart;
         theOptions = options;
     }
-    /****/
-    function makeUnique(list) {
-      var result = [];
-      $.each(list, function(i, e) {
-        if ($.inArray(e, result) == -1) result.push(e);
-      });
-      return result;
+    
+function populateDevices() {
+  var $dropdown = $("#devices");
+  var url = "http://" + urlBase + "/devices?ids=true";
+  $.getJSON(url, function(devIds) {
+    var idsRaspPi = [];
+    var idsOther = [];
+    for (i = 0; i < devIds.length; i++) {
+      if (devIds[i].startsWith("RaspPi")) {
+        idsRaspPi.push(devIds[i]);
+      } else if (!devIds[i].startsWith("zTest")) {
+        idsOther.push(devIds[i]);
+      }
     }
-   function populateDevices(){
-    var $dropdown = $("#devices");
-    var url = "http://" + urlBase + "/devices";
-    $.getJSON( url, function( dataReturned ) {
-        var lastElem = dataReturned[dataReturned.length-1];
-        console.log("ajax device request returned dataReturned size: " + dataReturned.length);
-        var deviceIds = [];
-        for( i = 0; i < dataReturned.length; i++ ) {
-            //console.log("deviceId: " + dataReturned[i].deviceId);
-            deviceIds.push(dataReturned[i].deviceId);
-        }
-        //console.log("deviceIds size: " + deviceIds.length);
-        var devIds = makeUnique(deviceIds);
-        deviceIdsRaspPi = [];
-        deviceIdsOther = [];
-        for( i = 0; i < devIds.length; i++ ) {
-            if(devIds[i].includes("RaspPi")){
-                deviceIdsRaspPi.push(devIds[i]);
-            } else if(devIds[i].includes("zTest")){
-                //skip and don't display these devices, they are from the unit tests
-            } else {
-                deviceIdsOther.push(devIds[i]);
-            }
-        }
-        deviceIdsOther.sort();
-        deviceIdsRaspPi.sort();
-        console.log("deviceIds post unique size: " + devIds.length);
-        //console.log("devIds: " + devIds);
-        for( i = 0; i < deviceIdsRaspPi.length; i++ ) {
-            $dropdown.append($("<option />").val(deviceIdsRaspPi[i]).text(deviceIdsRaspPi[i]));
-        }
-        for( i = 0; i < deviceIdsOther.length; i++ ) {
-            $dropdown.append($("<option />").val(deviceIdsOther[i]).text(deviceIdsOther[i]));
-        }
-    });
-  }
+    for(i = 0; i < idsRaspPi.length; i++) {
+      $dropdown.append($("<option />").val(idsRaspPi[i]).text(idsRaspPi[i]));
+    }
+    for(i = 0; i < idsOther.length; i++) {
+      $dropdown.append($("<option />").val(idsOther[i]).text(idsOther[i]));
+    }
+  });
+}
       function grabDataFromServer(startDate, endDate, chart, options) {
         //disable all buttons until data returns
         $(':button').prop('disabled', true);

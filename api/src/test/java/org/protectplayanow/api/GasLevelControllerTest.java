@@ -119,6 +119,19 @@ public class GasLevelControllerTest {
     }
 
     @Test
+    public void testGettingDeviceIds()  {
+        ResponseEntity<String> forEntity = restTemplate.getForEntity(urlBase + port + "/devices?ids=true", String.class);
+        log.info("\n\nresp: {}\n", forEntity.getBody());
+        ResponseEntity<List<String>> response = restTemplate.exchange(
+                urlBase + port + "/devices?ids=true",
+                HttpMethod.GET, null,
+                new ParameterizedTypeReference<List<String>>(){});
+        List<String> deviceIds = response.getBody();
+        log.info("\n\nresp: {}\n", deviceIds);
+        Assert.assertTrue("we got back some devices", deviceIds.size() > 0);
+    }
+
+    @Test
     public void testSendingNewReading()  {
 
         String randomDwviceId = "zTest" + new Date().toString().replace(" ", "");
