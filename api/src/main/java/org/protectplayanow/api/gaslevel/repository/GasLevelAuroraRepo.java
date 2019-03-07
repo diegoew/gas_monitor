@@ -91,6 +91,7 @@ public class GasLevelAuroraRepo implements GasLevelRepo {
 
         List<Device> devices = new ArrayList<>();
 
+        //TODO should be refactored to read from a separate table
         jdbcTemplate.query(
                 "select distinct deviceId, sensorType, latitude, longitude from reading " +
                         " order by deviceId asc",

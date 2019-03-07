@@ -126,10 +126,12 @@ public class GasLevelController {
         if (shouldIncludeIds) {
             return new ResponseEntity<List>(
                 gasLevelRepo.getDeviceIds(),
+                Constants.makeGlobalHeaders(globalValueMap.get(Constants.secondsBetweenReadings)),
                 HttpStatus.OK);
         } else {
             return new ResponseEntity<List>(
                 DeviceForRest.make(gasLevelRepo.getDevices()),
+                Constants.makeGlobalHeaders(globalValueMap.get(Constants.secondsBetweenReadings)),
                 HttpStatus.OK);
         }
     }
@@ -243,6 +245,7 @@ public class GasLevelController {
                 .relativeHumidity(relativeHumidity)
                 .build();
 
+        //TODO should be refactored to save deviceId and other device information in a new device table using a forked thread
         gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
 
         return new ResponseEntity<Void>(Constants.makeGlobalHeaders(
