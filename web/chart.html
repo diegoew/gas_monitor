@@ -11,8 +11,8 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js"></script>
     <p>Device <select id="devices"></select></p>
-    <p>Start <input type="text" class="datepicker" id="startPicker"></p>
-    <p>End <input type="text" class="datepicker" id="endPicker"></p>
+    <p>Start <input type="text" class="datepicker" style="width:150px;" id="startPicker"></p>
+    <p>End <input type="text" class="datepicker" style="width:150px;" id="endPicker"></p>
 		  Show last
 		  <select id="timeInterval" onchange="setDatePickersText(hoursAgoDate(this.value))">
 		    <option value="1">1 hour</option>
@@ -21,22 +21,49 @@
 		  </select>
 		<select id="dataType">
 		  <option id="resistance" value="resistance">Raw sensor resistance</option>
-		  <option id="ppm" value="ppm">Computed PPM</option>
+		  <option id="ppm" value="ppm">PPM estimate</option>
 		</select>
 		|
     <button id="update" onclick="getDataAndDrawChart()">Update chart</button>
     <div id="chart_div"></div>
     <script>
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(getDataAndDrawChart);
+
 var urlBase = "http://localhost:8080";
-var dateType = "reading";
+var dataType = "reading";
 var chart;
-var options;
-var dataTable;
+var chartOptions = {
+  legend: {position: 'none'},
+  chartArea: {
+    width: '90%',
+    height: '80%'
+  },
+  enableInteractivity: true,
+  vAxis: {
+    gridlines: {
+    },
+  },
+  hAxis: {
+    gridlines: {
+      count: -1,
+      units: {
+        days: {format: ['MMM dd']},
+        hours: {format: ['HH:mm', 'ha']},
+      }
+    },
+    minorGridlines: {
+      units: {
+        hours: {format: ['hh:mm:ss a', 'ha']},
+        minutes: {format: ['HH:mm a Z', ':mm']}
+      }
+    }
+  }
+};
+var chartData;
 
 populateDevices();
 setDatePickersText(hoursAgoDate(1));
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(initChartGetDataAndDraw);
 
 $("#endPicker").datepicker({
   onSelect: function(dateText) {
@@ -58,8 +85,7 @@ $(window).resize(function() {
 });
 
 $(window).on('resizeEnd', function() {
-  initChart();
-  chart.draw(dataTable, options);
+  chart.draw(chartData, chartOptions);
 });
 
 function setDatePickersText(startTime) {
@@ -89,51 +115,7 @@ function populateDevices() {
   });
 }
 
-function initChartGetDataAndDraw() {
-  initChart();
-  getDataAndDrawChart();
-}
-
-function initChart() {
-  options = {
-    /*
-    width: 900,
-    height: 500,
-    */
-    legend: {position: 'none'},
-    chartArea: {
-      width: '90%',
-      height: '85%'
-    },
-    enableInteractivity: true,
-    vAxis: {
-      gridlines: {
-        count: -1,
-        units: {
-        }
-      },
-    },
-    hAxis: {
-      gridlines: {
-        count: -1,
-        units: {
-          days: {format: ['MMM dd']},
-          hours: {format: ['HH:mm', 'ha']},
-        }
-      },
-      minorGridlines: {
-        units: {
-          hours: {format: ['hh:mm:ss a', 'ha']},
-          minutes: {format: ['HH:mm a Z', ':mm']}
-        }
-      }
-    }
-  };
-  chart = new google.visualization.LineChart($('#chart_div')[0]);
-}
-
 function getDataAndDrawChart() {
-  dataTable = new google.visualization.DataTable();
   var dev = $('#devices option:selected').text();
   var start = new Date($("#startPicker").val());
   var end = new Date($("#endPicker").val());
@@ -146,20 +128,22 @@ function getDataAndDrawChart() {
   $('select,button').prop('disabled', true);
   $.getJSON(url, function(data) {
     console.log("Received data size: " + data.length);
-    dataTable.addColumn('datetime', 'Time of Day');
-    dataTable.addColumn('number', 'Combustibles');
+    chartData = new google.visualization.DataTable();
+    chartData.addColumn('datetime', 'Time of Day');
+    chartData.addColumn('number', 'Combustibles');
+    chart = new google.visualization.LineChart($('#chart_div')[0]);
     chart.clearChart();
     var x;
     for (i = 0; i < data.length; i++) {
       x = data[i];
-      dataTable.addRows([
+      chartData.addRows([
         [
           new Date(x.instant),
           $('#dataType').val() == "resistance" ? x.reading : x.input
         ]
       ]);
     }
-    chart.draw(dataTable, options);
+    chart.draw(chartData, chartOptions);
     // Enable conrols
     $('select,button').prop('disabled', false);
   });
