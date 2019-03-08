@@ -3,26 +3,36 @@
   <head>
 		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta property="og:site_name" content="Protect Playa Now" />
-    <title>Gas Sensors - Protect Playa Now</title>
+    <title>Gas monitor readings - Protect Playa Now</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="chart.css">
   </head>
   <body>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js"></script>
-    <p>Device <select id="devices"></select></p>
-    <p>Start <input type="text" class="datepicker" style="width:150px;" id="startPicker"></p>
-    <p>End <input type="text" class="datepicker" style="width:150px;" id="endPicker"></p>
-		  Show last
-		  <select id="timeInterval" onchange="setDatePickersText(hoursAgoDate(this.value))">
-		    <option value="1">1 hour</option>
-		    <option value="6">6 hours</option>
-		    <option value="24">24 hours</option>
+    <p>
+      <span class="spacer">Device </span>
+      <select id="devices"></select>
+  		|
+		  <select id="dataType">
+		    <option id="resistance" value="resistance">Raw sensor resistance</option>
+		    <option id="ppm" value="ppm">PPM estimate</option>
 		  </select>
-		<select id="dataType">
-		  <option id="resistance" value="resistance">Raw sensor resistance</option>
-		  <option id="ppm" value="ppm">PPM estimate</option>
-		</select>
+    </p>
+    <p>
+      <span class="spacer">Start </span>
+      <input type="text" class="datepicker" style="width:170px;" id="startPicker">
+    </p>
+    <p>
+      <span class="spacer">End </span>
+      <input type="text" class="datepicker" style="width:170px;" id="endPicker">
+    </p>
+	  <span class="spacer">Show last</span>
+	  <select id="timeInterval" onchange="populateDatePickers(hoursAgoDate(this.value))">
+	    <option value="1">1 hour</option>
+	    <option value="6">6 hours</option>
+	    <option value="24">24 hours</option>
+	  </select>
 		|
     <button id="update" onclick="getDataAndDrawChart()">Update chart</button>
     <div id="chart_div"></div>
@@ -33,6 +43,7 @@ google.charts.setOnLoadCallback(getDataAndDrawChart);
 var urlBase = "http://localhost:8080";
 var dataType = "reading";
 var chart;
+var chartData;
 var chartOptions = {
   legend: {position: 'none'},
   chartArea: {
@@ -60,10 +71,9 @@ var chartOptions = {
     }
   }
 };
-var chartData;
 
 populateDevices();
-setDatePickersText(hoursAgoDate(1));
+populateDatePickers(hoursAgoDate(1));
 
 $("#endPicker").datepicker({
   onSelect: function(dateText) {
@@ -88,7 +98,7 @@ $(window).on('resizeEnd', function() {
   chart.draw(chartData, chartOptions);
 });
 
-function setDatePickersText(startTime) {
+function populateDatePickers(startTime) {
 	$("#startPicker").val(formatDateForDisplay(startTime));
 	$("#endPicker").val(formatDateForDisplay(new Date()));
 }
