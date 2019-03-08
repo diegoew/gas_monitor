@@ -38,6 +38,7 @@
     </p>
   <script>
 google.charts.load('current', {'packages':['corechart']});
+google.setOnLoadCallback(populateDevices);
 
 var urlBase = 'http://34.223.248.143';
 var dataType = 'reading';
@@ -113,13 +114,12 @@ function populateDatePickers(startTime) {
 }
 
 function getDataAndDrawChart() {
-  var dev = $('#devices option:selected').text();
   var start = new Date($('#startPicker').val());
   var end = new Date($('#endPicker').val());
-  var deviceIdParam = dev.length > 0 ? '&deviceId=' + dev : '';
-  var startDateParam = '&startDateTime=' + formatDateForServer(start);
-  var endDateParam = '&endDateTime=' +  formatDateForServer(end);
-  var url = urlBase + '/readings?gasName=methane' + deviceIdParam + startDateParam + endDateParam;
+  var startParam = '&startDateTime=' + formatDateForServer(start);
+  var endParam = '&endDateTime=' +  formatDateForServer(end);
+  var deviceParam = '&deviceId=' + $('#devices option:selected').text();
+  var url = urlBase + '/readings?gasName=methane' + deviceParam + startParam + endParam;
   console.log('url: ' + url);
   // Disable controls until data returns
   //$('select,button').prop('disabled', true);
@@ -160,8 +160,8 @@ function populateDevices() {
   });
 }
 
-populateDevices();
 populateDatePickers(hoursAgoDate(1));
+
 $('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 250) + 'px');
 $('#endPicker').datepicker({
   onSelect: function(dateText) {
