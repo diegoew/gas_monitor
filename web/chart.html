@@ -38,7 +38,6 @@
     </p>
   <script>
 google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(getDataAndDrawChart);
 
 var urlBase = "http://localhost:8080";
 var dataType = "reading";
@@ -137,7 +136,7 @@ function getDataAndDrawChart() {
     console.log("Received data size: " + data.length);
     chartData = new google.visualization.DataTable();
     chartData.addColumn('datetime', 'Time of Day');
-    chartData.addColumn('number', 'Combustibles');
+    chartData.addColumn('number', 'Value');
     chart = new google.visualization.LineChart($('#chart_div')[0]);
     chart.clearChart();
     var x;
