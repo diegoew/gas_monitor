@@ -69,7 +69,7 @@ var chartOptions = {
 
 populateDevices();
 populateDatePickers(hoursAgoDate(1));
-
+$('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 250) + 'px');
 $("#endPicker").datepicker({
   onSelect: function(dateText) {
     $('#endPicker').val(dateText + " " + timeStr(new Date()));
@@ -90,6 +90,7 @@ $(window).resize(function() {
 });
 
 $(window).on('resizeEnd', function() {
+  $('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 250) + 'px');
   chart.draw(chartData, chartOptions);
 });
 
