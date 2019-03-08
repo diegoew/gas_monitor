@@ -13,8 +13,8 @@ WEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 WEATHER_RETRIEVAL_INTERVAL_SECONDS = 60
 
 DEFAULT_SECONDS_BETWEEN_READINGS = 60
-SERVER_URL = 'http://34.223.248.143/readings/calculate'
-
+SECONDS_BETWEEN_UPLOAD_RETRIES = 3600
+SERVER = 'http://34.223.248.143'
 
 import inspect
 import logging

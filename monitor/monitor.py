@@ -13,8 +13,7 @@ import time
 import requests
 
 import adc as adc_
-from config import DEFAULT_SECONDS_BETWEEN_READINGS, SERVER_URL, DEVICE_ID, \
-    LAT, LON, SENSOR_TYPES, ADC_TYPE
+from config import ADC_TYPE, EDEFAULT_SECONDS_BETWEEN_READINGS  SENSOR_TYPES 
 import db
 import openweather
 
@@ -114,8 +113,8 @@ def run():
 
     try:
         ros = get_ros()
+        delay = None
 
-        delay = DEFAULT_SECONDS_BETWEEN_READINGS
         while True:
             start = time.time()
 
@@ -125,8 +124,8 @@ def run():
                 dt = datetime.now(timezone.utc).astimezone()
                 logging.info('%s=%g ' % (sensor_type, val))
                 temp, hum = openweather.get_temperature_and_rel_humidity()
-                db.store_reading(dt, sensor_type, val, ro, temp, hum)
-                delay = upload_recorded()
+                db.store_reading(dt, sensor_type, val, ro, adc.RESOLUTION, temp, hum)
+                delay = uploader.upload(str(dt), sensor_type, val, adc.RESOLUTION)
 
             try:
                 delay = float(delay)
