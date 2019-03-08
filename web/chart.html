@@ -1,46 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
   <head>
-		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta property="og:site_name" content="Protect Playa Now" />
+		<meta content='text/html;charset=utf-8' http-equiv='Content-Type'>
+    <meta property='og:site_name' content='Protect Playa Now' />
     <title>Gas monitor readings - Protect Playa Now</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <link rel="stylesheet" href="chart.css">
+    <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+    <link rel='stylesheet' href='chart.css'>
   </head>
   <body>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js"></script>
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js'></script>
     <p>
-      <span class="label">Start </span>
-      <input type="text" class="datepicker" style="width:170px;" id="startPicker">
+      <span class='label'>Start </span>
+      <input type='text' class='datepicker' style='width:170px;' id='startPicker'>
     </p>
     <p>
-      <span class="label">End </span>
-      <input type="text" class="datepicker" style="width:170px;" id="endPicker">
+      <span class='label'>End </span>
+      <input type='text' class='datepicker' style='width:170px;' id='endPicker'>
     </p>
-	  <span class="label">Show last</span>
-    <select id="timeInterval" onchange="populateDatePickers(hoursAgoDate(this.value))">
-      <option value="1">1 hour</option>
-      <option value="6">6 hours</option>
-      <option value="24">24 hours</option>
+	  <span class='label'>Show last</span>
+    <select id='timeInterval' onchange='populateDatePickers(hoursAgoDate(this.value))'>
+      <option value='1'>1 hour</option>
+      <option value='6'>6 hours</option>
+      <option value='24'>24 hours</option>
     </select>
     <p>
-      <span class="label">Device </span>
-      <select id="devices"></select>
-  		<span class="div">
-		  <select id="dataType">
-		    <option id="resistance" value="resistance">Raw sensor resistance</option>
-		    <option id="ppm" value="ppm">PPM estimate</option>
+      <span class='label'>Device </span>
+      <select id='devices'></select>
+  		<span class='div'>
+		  <select id='dataType'>
+		    <option id='resistance' value='resistance'>Raw sensor resistance</option>
+		    <option id='ppm' value='ppm'>PPM estimate</option>
 		  </select>
-		  <span class="div"/>
-      <button id="update" onclick="getDataAndDrawChart()">Update chart</button>
-      <div id="chart_div"></div>
+		  <span class='div'/>
+      <button id='update' onclick='getDataAndDrawChart()'>Update chart</button>
+      <div id='chart_div'></div>
     </p>
   <script>
 google.charts.load('current', {'packages':['corechart']});
 
-var urlBase = "http://localhost:8080";
-var dataType = "reading";
+var urlBase = 'http://localhost:8080';
+var dataType = 'reading';
 var chart;
 var chartData;
 var chartOptions = {
@@ -70,15 +70,15 @@ var chartOptions = {
 populateDevices();
 populateDatePickers(hoursAgoDate(1));
 $('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 250) + 'px');
-$("#endPicker").datepicker({
+$('#endPicker').datepicker({
   onSelect: function(dateText) {
-    $('#endPicker').val(dateText + " " + timeStr(new Date()));
+    $('#endPicker').val(dateText + ' ' + timeStr(new Date()));
   }
 });
 
-$("#startPicker").datepicker({
+$('#startPicker').datepicker({
   onSelect: function(dateText) {
-    $('#startPicker').val(dateText + " " + timeStr(new Date()));
+    $('#startPicker').val(dateText + ' ' + timeStr(new Date()));
   }
 });
 
@@ -95,28 +95,28 @@ $(window).on('resizeEnd', function() {
 });
 
 function populateDatePickers(startTime) {
-	$("#startPicker").val(formatDateForDisplay(startTime));
-	$("#endPicker").val(formatDateForDisplay(new Date()));
+	$('#startPicker').val(formatDateForDisplay(startTime));
+	$('#endPicker').val(formatDateForDisplay(new Date()));
 }
 
 function populateDevices() {
-  var $dropdown = $("#devices");
-  var url = urlBase + "/devices?ids=true";
+  var $dropdown = $('#devices');
+  var url = urlBase + '/devices?ids=true';
   $.getJSON(url, function(devIds) {
     var idsRaspPi = [];
     var idsOther = [];
     for (i = 0; i < devIds.length; i++) {
-      if (devIds[i].startsWith("RaspPi")) {
+      if (devIds[i].startsWith('RaspPi')) {
         idsRaspPi.push(devIds[i]);
-      } else if (!devIds[i].startsWith("zTest")) {
+      } else if (!devIds[i].startsWith('zTest')) {
         idsOther.push(devIds[i]);
       }
     }
     for (i = 0; i < idsRaspPi.length; i++) {
-      $dropdown.append($("<option />").val(idsRaspPi[i]).text(idsRaspPi[i]));
+      $dropdown.append($('<option />').val(idsRaspPi[i]).text(idsRaspPi[i]));
     }
     for (i = 0; i < idsOther.length; i++) {
-      $dropdown.append($("<option />").val(idsOther[i]).text(idsOther[i]));
+      $dropdown.append($('<option />').val(idsOther[i]).text(idsOther[i]));
     }
     getDataAndDrawChart();
   });
@@ -124,20 +124,20 @@ function populateDevices() {
 
 function getDataAndDrawChart() {
   var dev = $('#devices option:selected').text();
-  var start = new Date($("#startPicker").val());
-  var end = new Date($("#endPicker").val());
-  var deviceIdParam = dev.length > 0 ? "&deviceId=" + dev : "";
-  var startDateParam = "&startDateTime=" + formatDateForServer(start);
-  var endDateParam = "&endDateTime=" +  formatDateForServer(end);
-  var url = urlBase + "/readings?gasName=methane" + deviceIdParam + startDateParam + endDateParam;
-  console.log("url: " + url);
+  var start = new Date($('#startPicker').val());
+  var end = new Date($('#endPicker').val());
+  var deviceIdParam = dev.length > 0 ? '&deviceId=' + dev : '';
+  var startDateParam = '&startDateTime=' + formatDateForServer(start);
+  var endDateParam = '&endDateTime=' +  formatDateForServer(end);
+  var url = urlBase + '/readings?gasName=methane' + deviceIdParam + startDateParam + endDateParam;
+  console.log('url: ' + url);
   // Disable controls until data returns
   $('select,button').prop('disabled', true);
   $.getJSON(url, function(data) {
-    console.log("Received data size: " + data.length);
+    console.log('Received data size: ' + data.length);
     chartData = new google.visualization.DataTable();
     chartData.addColumn('datetime', 'Time of Day');
-    chartData.addColumn('number', 'Value');
+    chartData.addColumn('number', '');
     chart = new google.visualization.LineChart($('#chart_div')[0]);
     chart.clearChart();
     var x;
@@ -146,7 +146,7 @@ function getDataAndDrawChart() {
       chartData.addRows([
         [
           new Date(x.instant),
-          $('#dataType').val() == "resistance" ? x.reading : x.input
+          $('#dataType').val() == 'resistance' ? x.reading : x.input
         ]
       ]);
     }
@@ -163,7 +163,7 @@ function formatDateForDisplay(d) {
   var day = d.getDate();
   if (month < 10) month = '0' + month;
   if (day < 10) day = '0' + day;
-  return month + "/" + day + "/" + year + " " + timeStr(d);
+  return month + '/' + day + '/' + year + ' ' + timeStr(d);
 }
 
 function formatDateForServer(d) {
@@ -176,8 +176,8 @@ function formatDateForServer(d) {
   if (month < 10) month = '0' + month;
   if (day < 10) day = '0' + day;
   if (a < 10) a = '0' + a;
-  var tz = (z < 0 ? '+' : '-') + a + ":00";
-  return year + "-" + month + "-"  + day + "T" + timeStr(d) + tz;  
+  var tz = (z < 0 ? '+' : '-') + a + ':00';
+  return year + '-' + month + '-'  + day + 'T' + timeStr(d) + tz;  
 }
 
 function hoursAgoDate(hours) {
@@ -190,10 +190,10 @@ function timeStr(d) {
   var h = d.getHours();
   var m = d.getMinutes();
   var s = d.getSeconds();
-  if (h < 10) h = "0" + h;
-  if (m < 10) m = "0" + h;
-  if (s < 10) s = "0" + h;
-  return h + ":" + m + ":" + s;
+  if (h < 10) h = '0' + h;
+  if (m < 10) m = '0' + h;
+  if (s < 10) s = '0' + h;
+  return h + ':' + m + ':' + s;
 }
     </script>
   </body>
