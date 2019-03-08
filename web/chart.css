@@ -1,7 +1,12 @@
-.spacer {
+.label {
   float: left;
   width: 80px;
   text-align:right;
   margin-right:5px;
   margin-top:5px;
+}
+.div {
+  margin-right: 10px;
+  margin-left: 10px;
+  text-align: center;
 }
