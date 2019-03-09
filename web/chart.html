@@ -48,7 +48,7 @@ var chartOptions = {
   legend: {position: 'none'},
   chartArea: {
     width: '90%',
-    height: '80%'
+    height: '90%'
   },
   enableInteractivity: true,
   hAxis: {
@@ -162,7 +162,7 @@ function populateDevices() {
 
 populateDatePickers(hoursAgoDate(1));
 
-$('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 250) + 'px');
+$('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 220) + 'px');
 $('#endPicker').datepicker({
   onSelect: function(dateText) {
     $('#endPicker').val(dateText + ' ' + timeStr(new Date()));
