@@ -59,8 +59,9 @@ public class Reading {
             case Constants.mq9 :
                 loadResistance = RL_MQ9;
                 ro = this.getRo() == 0 ? 50 : this.getRo();
-                calcMap.put(Constants.lpg, new CalcConsts(972.52, -2.133));
-                calcMap.put(Constants.co, new CalcConsts(579.05, -2.247));
+                //Commenting out since we are ignoring other gases for now
+                //calcMap.put(Constants.lpg, new CalcConsts(972.52, -2.133));
+                //calcMap.put(Constants.co, new CalcConsts(579.05, -2.247));
                 calcMap.put(Constants.Methane, new CalcConsts(4286.3, -2.624));
                 break;
 

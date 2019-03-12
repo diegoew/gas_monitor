@@ -231,22 +231,24 @@ public class GasLevelController {
 
         log.info("deviceId={}, instant={}, latitude={}, longitude={}, sensorTypeMsg={}", deviceId, instant, latitude, longitude, sensorType);
 
-        Reading r = Reading.builder()
-                .deviceId(deviceId)
-                .instant(instant)
-                .latitude(latitude)
-                .longitude(longitude)
-                .reading(reading)
-                .input(reading)
-                .sensorType(sensorType)
-                .resolution(resolution)
-                .ro(ro)
-                .tempInCelsius(tempInCelsius)
-                .relativeHumidity(relativeHumidity)
-                .build();
+        if(sensorType.equals(Constants.mq9)) {
+            Reading r = Reading.builder()
+                    .deviceId(deviceId)
+                    .instant(instant)
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .reading(reading)
+                    .input(reading)
+                    .sensorType(sensorType)
+                    .resolution(resolution)
+                    .ro(ro)
+                    .tempInCelsius(tempInCelsius)
+                    .relativeHumidity(relativeHumidity)
+                    .build();
 
-        //TODO should be refactored to save deviceId and other device information in a new device table using a forked thread
-        gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
+            //TODO should be refactored to save deviceId and other device information in a new device table using a forked thread
+            gasLevelRepo.saveGasReadings(r.makeReadingsWithCalculation());
+        }
 
         return new ResponseEntity<Void>(Constants.makeGlobalHeaders(
                 globalValueMap.get(Constants.secondsBetweenReadings)),
