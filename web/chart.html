@@ -137,12 +137,12 @@ function getDataAndDrawChart() {
       chartData.addRows([
         [
           new Date(x.instant),
-          $('#dataType').val() == 'resistance' ? x.reading : x.input
+          $('#dataType').val() == 'resistance' ?  x.input : x.reading
         ]
       ]);
     }
     chart.draw(chartData, chartOptions);
-    // Enable conrols
+    // Enable controls
     $('select,button').prop('disabled', false);
   });
 };
