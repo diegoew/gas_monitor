@@ -29,8 +29,8 @@
       <select id='devices'></select>
   		<span class='div'>
 		  <select id='dataType'>
-		    <option id='resistance' value='resistance'>Raw sensor resistance</option>
-		    <option id='ppm' value='ppm'>PPM estimate</option>
+		    <option value='raw'>Raw sensor value</option>
+		    <option value='ppm'>PPM estimate</option>
 		  </select>
 		  <span class='div'/>
       <button id='update' onclick='getDataAndDrawChart()'>Update chart</button>
@@ -137,7 +137,7 @@ function getDataAndDrawChart() {
       chartData.addRows([
         [
           new Date(x.instant),
-          $('#dataType').val() == 'resistance' ?  x.input : x.reading
+          $('#dataType').val() == 'raw' ?  x.input : x.reading
         ]
       ]);
     }
