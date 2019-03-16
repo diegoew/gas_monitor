@@ -151,9 +151,15 @@ function populateDevices() {
   var $dropdown = $('#devices');
   var url = urlBase + '/devices?ids=true';
   $.getJSON(url, function(devIds) {
+    var isSel = false;
+    var id;
     for (i = 0; i < devIds.length; i++) {
-      if (!devIds[i].startsWith('zTest')) {
-        $dropdown.append($('<option />').val(devIds[i]).text(devIds[i]));
+      id = devIds[i]
+      if (!isSel && id.startsWith('RaspPi-GasMonitor')) {
+        $dropdown.append($('<option selected/>').val(id).text(id));
+        isSel = true;
+      } else if (!id.startsWith('zTest')) {
+        $dropdown.append($('<option />').val(id).text(id));
       }
     }
     getDataAndDrawChart();
