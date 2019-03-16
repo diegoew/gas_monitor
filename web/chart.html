@@ -19,16 +19,16 @@
       <input type='text' class='datepicker' style='width:170px;' id='endPicker'>
     </p>
 	  <span class='label'>Show last</span>
-    <select id='timeInterval' onchange='populateDatePickers(hoursAgoDate(this.value))'>
+    <select id='timeInterval' onchange='populateDatePickers(hoursAgoDate(this.value)); getDataAndDrawChart()'>
       <option selected="selected" value='1'>1 hour</option>
       <option value='6'>6 hours</option>
       <option value='24'>24 hours</option>
     </select>
     <p>
       <span class='label'>Device </span>
-      <select id='devices'></select>
+      <select id='devices' onchange='getDataAndDrawChart()'></select>
   		<span class='div'>
-		  <select id='dataType'>
+		  <select id='dataType' onchange='getDataAndDrawChart()'>
 		    <option value='raw'>Raw sensor value</option>
 		    <option value='ppm'>PPM estimate</option>
 		  </select>
