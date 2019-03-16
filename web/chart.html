@@ -121,8 +121,7 @@ function getDataAndDrawChart() {
   var deviceParam = '&deviceId=' + $('#devices option:selected').text();
   var url = urlBase + '/readings?gasName=methane' + deviceParam + startParam + endParam;
   console.log('url: ' + url);
-  // Disable controls until data returns
-  //$('select,button').prop('disabled', true);
+  $('select,button').prop('disabled', true);
   $.getJSON(url, function(data) {
     console.log('Received data size: ' + data.length);
     chartData = new google.visualization.DataTable();
@@ -142,7 +141,6 @@ function getDataAndDrawChart() {
       ]);
     }
     chart.draw(chartData, chartOptions);
-    // Enable controls
     $('select,button').prop('disabled', false);
   });
 };
