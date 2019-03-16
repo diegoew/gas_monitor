@@ -1,40 +1,40 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang=en>
   <head>
     <meta content='text/html;charset=utf-8' http-equiv='Content-Type'>
     <meta property='og:site_name' content='Protect Playa Now' />
     <title>Gas monitor readings - Protect Playa Now</title>
-    <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
-    <link rel='stylesheet' href='chart.css'>
+    <script type=text/javascript src=https://www.gstatic.com/charts/loader.js></script>
+    <link rel=stylesheet href=chart.css>
   </head>
   <body>
-    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
-    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js'></script>
+    <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js></script>
+    <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js></script>
     <p>
-      <span class='label'>Start </span>
-      <input type='text' class='datepicker' style='width:170px;' id='startPicker'>
+      <span class=label>Start </span>
+      <input type=text class=datepicker id=startPicker>
     </p>
     <p>
-      <span class='label'>End </span>
-      <input type='text' class='datepicker' style='width:170px;' id='endPicker'>
+      <span class=label>End </span>
+      <input type=text class=datepicker id=endPicker>
     </p>
-    <span class='label'>Show last</span>
-    <select id='timeInterval' onchange='populateDatePickers(hoursAgoDate(this.value)); getDataAndDrawChart()'>
-      <option selected="selected" value='1'>1 hour</option>
-      <option value='6'>6 hours</option>
-      <option value='24'>24 hours</option>
+    <span class=label>Show last</span>
+    <select id=timeInterval onchange='populateDatePickers(); getDataAndDrawChart()'>
+      <option selected value=1>1 hour</option>
+      <option value=6>6 hours</option>
+      <option value=24>24 hours</option>
     </select>
     <p>
-      <span class='label'>Device </span>
-      <select id='devices' onchange='getDataAndDrawChart()'></select>
-      <span class='div'>
-      <select id='dataType' onchange='getDataAndDrawChart()'>
-        <option value='raw'>Raw sensor value</option>
-        <option value='ppm'>PPM estimate</option>
+      <span class=label>Device </span>
+      <select id=devices onchange=getDataAndDrawChart()></select>
+      <span class=div>
+      <select id=dataType onchange=getDataAndDrawChart()>
+        <option value=raw>Raw sensor value</option>
+        <option value=ppm>PPM estimate</option>
       </select>
-      <span class='div'/>
-      <button id='update' onclick='getDataAndDrawChart()'>Update chart</button>
-      <div id='chart_div'></div>
+      <span class=div />
+      <button id=update onclick='populateDatePickers(); getDataAndDrawChart()'>Update chart</button>
+      <div id=chart_div></div>
     </p>
   <script>
 google.charts.load('current', {'packages':['corechart']});
@@ -107,7 +107,8 @@ function hoursAgoDate(hours) {
   return date;
 }
 
-function populateDatePickers(startTime) {
+function populateDatePickers() {
+  var startTime = hoursAgoDate($('#timeInterval').val())
   $('#startPicker').val(formatDateForDisplay(startTime));
   $('#endPicker').val(formatDateForDisplay(new Date()));
 }
@@ -120,7 +121,7 @@ function getDataAndDrawChart() {
   var deviceParam = '&deviceId=' + $('#devices option:selected').text();
   var url = urlBase + '/readings?gasName=methane' + deviceParam + startParam + endParam;
   console.log('url: ' + url);
-  $('select,button').prop('disabled', true);
+  //$('select,button').prop('disabled', true);
   $.getJSON(url, function(data) {
     console.log('Received data size: ' + data.length);
     chartData = new google.visualization.DataTable();
@@ -129,8 +130,7 @@ function getDataAndDrawChart() {
     chart = new google.visualization.LineChart($('#chart_div')[0]);
     chart.clearChart();
     var x;
-    var l = data.length
-    for (i = 0; i < l; i++) {
+    for (i in data) {
       x = data[i];
       chartData.addRows([
         [
@@ -150,10 +150,10 @@ function populateDevices() {
   $.getJSON(url, function(devIds) {
     var isSel = false;
     var id;
-    for (i = 0; i < devIds.length; i++) {
+    for (i in devIds) {
       id = devIds[i]
       if (!isSel && id.startsWith('RaspPi-GasMonitor')) {
-        $dropdown.append($('<option selected/>').val(id).text(id));
+        $dropdown.append($('<option selected />').val(id).text(id));
         isSel = true;
       } else if (!id.startsWith('zTest')) {
         $dropdown.append($('<option />').val(id).text(id));
@@ -163,7 +163,7 @@ function populateDevices() {
   });
 }
 
-populateDatePickers(hoursAgoDate(1));
+populateDatePickers();
 
 $('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 220) + 'px');
 $('#endPicker').datepicker({

@@ -1,6 +1,9 @@
 body {
   font-family: sans-serif
 }
+.datepicker {
+  width: 170px; 
+}
 .label {
   float: left;
   width: 90px;
