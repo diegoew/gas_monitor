@@ -21,7 +21,7 @@
     </p>
     <span class=label>Show last</span>
     <select id=timeInterval onchange='populateDatePickers(); getDataAndDrawChart()'>
-      <option selected value=1>1 hour</option>
+      <option value=1 selected>1 hour</option>
       <option value=6>6 hours</option>
       <option value=24>24 hours</option>
     </select>
@@ -73,8 +73,8 @@ function timeStr(d) {
   var m = d.getMinutes();
   var s = d.getSeconds();
   if (h < 10) h = '0' + h;
-  if (m < 10) m = '0' + h;
-  if (s < 10) s = '0' + h;
+  if (m < 10) m = '0' + m;
+  if (s < 10) s = '0' + s;
   return h + ':' + m + ':' + s;
 }
 
@@ -118,11 +118,11 @@ function getDataAndDrawChart() {
   var start = new Date($('#startPicker').val());
   var end = new Date($('#endPicker').val());
   var startParam = '&startDateTime=' + formatDateForServer(start);
-  var endParam = '&endDateTime=' +  formatDateForServer(end);
+  var endParam = '&endDateTime=' + formatDateForServer(end);
   var deviceParam = '&deviceId=' + $('#devices option:selected').text();
   var url = urlBase + '/readings?gasName=methane' + deviceParam + startParam + endParam;
   console.log('url: ' + url);
-  //$('select,button').prop('disabled', true);
+  $('select,button').prop('disabled', true);
   $.getJSON(url, function(data) {
     console.log('Received data size: ' + data.length);
     chartData = new google.visualization.DataTable();
