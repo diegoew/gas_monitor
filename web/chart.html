@@ -13,14 +13,15 @@
     <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js></script>
     <p>
       <span class=label>Start </span>
-      <input type=text class=datepicker id=startPicker>
+      <input type=text class=datepicker id=startPicker onclick=resetTimeAgo() onchange=resetTimeAgo()>
     </p>
     <p>
       <span class=label>End </span>
-      <input type=text class=datepicker id=endPicker>
+      <input type=text class=datepicker id=endPicker onclick=resetTimeAgo() onchange=resetTimeAgo()>
     </p>
     <span class=label>Show last</span>
-    <select id=timeInterval onchange='populateDatePickers(); getDataAndDrawChart()'>
+    <select id=timeAgo onchange='setDatePickers(); getDataAndDrawChart()'>
+      <option value=-1></option>
       <option value=1 selected>1 hour</option>
       <option value=6>6 hours</option>
       <option value=24>24 hours</option>
@@ -34,7 +35,7 @@
         <option value=ppm>PPM estimate</option>
       </select>
       <span class=div />
-      <button id=update onclick='populateDatePickers(); getDataAndDrawChart()'>Update chart</button>
+      <button id=update onclick='setDatePickers(); getDataAndDrawChart()'>Update chart</button>
       <div id=chart_div></div>
     </p>
   <script>
@@ -108,10 +109,16 @@ function hoursAgoDate(hours) {
   return date;
 }
 
-function populateDatePickers() {
-  var startTime = hoursAgoDate($('#timeInterval').val())
+function setDatePickers() {
+  var ago = $('#timeAgo').val();
+  if (ago < 0) return;
+  var startTime = hoursAgoDate(ago)
   $('#startPicker').val(formatDateForDisplay(startTime));
   $('#endPicker').val(formatDateForDisplay(new Date()));
+}
+
+function resetTimeAgo() {
+  $('#timeAgo').val(-1);
 }
 
 function getDataAndDrawChart() {
@@ -121,7 +128,7 @@ function getDataAndDrawChart() {
   var endParam = '&endDateTime=' + formatDateForServer(end);
   var deviceParam = '&deviceId=' + $('#devices option:selected').text();
   var url = urlBase + '/readings?gasName=methane' + deviceParam + startParam + endParam;
-  console.log('url: ' + url);
+  console.log(url);
   $('select,button').prop('disabled', true);
   $.getJSON(url, function(data) {
     console.log('Received data size: ' + data.length);
@@ -164,7 +171,7 @@ function populateDevices() {
   });
 }
 
-populateDatePickers();
+setDatePickers();
 
 $('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 220) + 'px');
 $('#endPicker').datepicker({
