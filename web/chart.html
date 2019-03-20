@@ -7,37 +7,39 @@
     <script type=text/javascript src=https://www.gstatic.com/charts/loader.js></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css">
     <link rel=stylesheet href=chart.css>
-  </head>
-  <body>
     <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js></script>
     <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js></script>
-    <p>
-      <span class=label>Device</span>
-      <select id=devices onchange=getDataAndDrawChart()></select>
-      <span class=sep>
-      <select id=dataType onchange=getDataAndDrawChart()>
-        <option value=raw>Raw sensor value</option>
-        <option value=ppm>PPM estimate</option>
+  </head>
+  <body>
+    <span id=controls>
+      <p>
+        <span class=label>Device</span>
+        <select id=devices onchange=getDataAndDrawChart()></select>
+        <span class=sep />
+        <select id=dataType onchange=getDataAndDrawChart()>
+          <option value=raw>Raw sensor value</option>
+          <option value=ppm>PPM estimate</option>
+        </select>
+      </p>
+      <p>
+        <span class=label>Start</span>
+        <input type=text class=datepicker id=startPicker onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
+      </p>
+      <p>
+        <span class=label>End</span>
+        <input type=text class=datepicker id=endPicker onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
+      </p>
+      <span class=label>Show last</span>
+      <select id=ago onchange='setDatePickers(); getDataAndDrawChart()'>
+        <option disabled></option>
+        <option value=1 selected>1 hour</option>
+        <option value=6>6 hours</option>
+        <option value=24>24 hours</option>
       </select>
-    </p>
-    <p>
-      <span class=label>Start</span>
-      <input type=text class=datepicker id=startPicker onclick=resetTimeAgo() onchange=resetTimeAgo()>
-    </p>
-    <p>
-      <span class=label>End</span>
-      <input type=text class=datepicker id=endPicker onclick=resetTimeAgo() onchange=resetTimeAgo()>
-    </p>
-    <span class=label>Show last</span>
-    <select id=timeAgo onchange='setDatePickers(); getDataAndDrawChart()'>
-      <option value=-1 disabled></option>
-      <option value=1 selected>1 hour</option>
-      <option value=6>6 hours</option>
-      <option value=24>24 hours</option>
-    </select>
-    <span class=sep />
-    <button id=update onclick='setDatePickers(); getDataAndDrawChart()'>Update chart</button>
-    <div id=chart_div></div>
+        <span class=sep />
+      <button id=update onclick='setDatePickers(); getDataAndDrawChart()'>Update chart</button>
+      <div id=chart_div></div>
+    </span>
   <script>
 google.charts.load('current', {'packages':['corechart']});
 google.setOnLoadCallback(populateDevices);
@@ -60,11 +62,19 @@ var chartOptions = {
         hours: {format: ['HH:mm', 'ha']},
       }
     },
+    textStyle: {
+      fontSize: '11'
+    },
     minorGridlines: {
       units: {
         hours: {format: ['hh:mm:ss a', 'ha']},
         minutes: {format: ['HH:mm a Z', ':mm']}
       }
+    }
+  },
+  vAxis: {
+    textStyle: {
+      fontSize: '11'
     }
   }
 };
@@ -110,15 +120,11 @@ function hoursAgoDate(hours) {
 }
 
 function setDatePickers() {
-  var ago = $('#timeAgo').val();
-  if (ago < 0) return;
+  var ago = $('#ago').val();
+  if (ago == null) return;
   var startTime = hoursAgoDate(ago)
   $('#startPicker').val(formatDateForDisplay(startTime));
   $('#endPicker').val(formatDateForDisplay(new Date()));
-}
-
-function resetTimeAgo() {
-  $('#timeAgo').val(-1);
 }
 
 function getDataAndDrawChart() {
@@ -171,9 +177,14 @@ function populateDevices() {
   });
 }
 
+function resizeChart() {
+  var height = (window.innerHeight - $('#controls').height() - 60);
+  $('#chart_div')[0].setAttribute('style', 'height:' + height + 'px');
+}
+
+resizeChart();
 setDatePickers();
 
-$('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 220) + 'px');
 $('#endPicker').datepicker({
   onSelect: function(dateText) {
     $('#endPicker').val(dateText + ' ' + timeStr(new Date()));
@@ -194,10 +205,9 @@ $(window).resize(function() {
 });
 
 $(window).on('resizeEnd', function() {
-  $('#chart_div')[0].setAttribute('style', 'height:' + (window.innerHeight - 250) + 'px');
+  resizeChart();
   chart.draw(chartData, chartOptions);
 });
-
     </script>
   </body>
 </html>
