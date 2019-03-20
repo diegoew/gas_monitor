@@ -2,7 +2,7 @@ body {
   font-family: sans-serif
 }
 .datepicker {
-  width: 10em; 
+  width: 9.5em; 
 }
 .label {
   float: left;
@@ -11,7 +11,7 @@ body {
   margin-right:5px;
   margin-top:7px;
 }
-.div {
+.sep {
   margin-right: 10px;
   margin-left: 10px;
   text-align: center;
