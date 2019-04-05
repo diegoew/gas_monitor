@@ -12,34 +12,42 @@
   </head>
   <body>
     <span id=controls>
-      <p>
+      <span class=group>
         <span class=label>Device</span>
         <select id=devices onchange=getDataAndDrawChart()></select>
-        <span class=sep />
+      </span>
+      <span class=group>
+        <span class=label></span>
         <select id=dataType onchange=getDataAndDrawChart()>
           <option value=raw>Raw sensor value</option>
           <option value=ppm>PPM estimate</option>
         </select>
-      </p>
-      <p>
+      </span>
+      <br/>
+      <span class=group>
         <span class=label>Start</span>
-        <input type=text class=datepicker id=startPicker onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
-      </p>
-      <p>
+        <input class=datepicker id=start onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
+      </span>
+      <br/>
+      <span class=group>
         <span class=label>End</span>
-        <input type=text class=datepicker id=endPicker onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
-      </p>
-      <span class=label>Show last</span>
-      <select id=ago onchange='setDatePickers(); getDataAndDrawChart()'>
-        <option disabled></option>
-        <option value=1 selected>1 hour</option>
-        <option value=6>6 hours</option>
-        <option value=24>24 hours</option>
-      </select>
-        <span class=sep />
-      <button id=update onclick='setDatePickers(); getDataAndDrawChart()'>Update chart</button>
-      <div id=chart_div></div>
+        <input class=datepicker id=end onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
+      </span>
+      <span class=group>
+        <span class=label>Show last</span>
+        <select id=ago onchange='setDatePickers(); getDataAndDrawChart()'>
+          <option disabled></option>
+          <option value=1 selected>1 hour</option>
+          <option value=6>6 hours</option>
+          <option value=24>24 hours</option>
+        </select>
+      </span>
+      <span class=group>
+        <span class=label></span>
+        <button id=update onclick='setDatePickers(); getDataAndDrawChart()'>Update chart</button>
+      </span>
     </span>
+    <div id=chart_div></div>
   <script>
 google.charts.load('current', {'packages':['corechart']});
 google.setOnLoadCallback(populateDevices);
@@ -123,13 +131,13 @@ function setDatePickers() {
   var ago = $('#ago').val();
   if (ago == null) return;
   var startTime = hoursAgoDate(ago)
-  $('#startPicker').val(formatDateForDisplay(startTime));
-  $('#endPicker').val(formatDateForDisplay(new Date()));
+  $('#start').val(formatDateForDisplay(startTime));
+  $('#end').val(formatDateForDisplay(new Date()));
 }
 
 function getDataAndDrawChart() {
-  var start = new Date($('#startPicker').val());
-  var end = new Date($('#endPicker').val());
+  var start = new Date($('#start').val());
+  var end = new Date($('#end').val());
   var startParam = '&startDateTime=' + formatDateForServer(start);
   var endParam = '&endDateTime=' + formatDateForServer(end);
   var deviceParam = '&deviceId=' + $('#devices option:selected').text();
@@ -178,22 +186,23 @@ function populateDevices() {
 }
 
 function resizeChart() {
-  var height = (window.innerHeight - $('#controls').height() - 60);
+  var height = Math.max(200, window.innerHeight - $('#controls').height() - 60);
+  console.log($('#controls').height());
   $('#chart_div')[0].setAttribute('style', 'height:' + height + 'px');
 }
 
 resizeChart();
 setDatePickers();
 
-$('#endPicker').datepicker({
+$('#end').datepicker({
   onSelect: function(dateText) {
-    $('#endPicker').val(dateText + ' ' + timeStr(new Date()));
+    $('#end').val(dateText + ' ' + timeStr(new Date()));
   }
 });
 
-$('#startPicker').datepicker({
+$('#start').datepicker({
   onSelect: function(dateText) {
-    $('#startPicker').val(dateText + ' ' + timeStr(new Date()));
+    $('#start').val(dateText + ' ' + timeStr(new Date()));
   }
 });
 

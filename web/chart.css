@@ -5,13 +5,18 @@ body {
   width: 9.5em; 
 }
 .label {
-  float: left;
-  width: 90px;
+  display: inline-block;
+  white-space: nowrap;
+  width: 7em;
   text-align: right;
   margin-right: 5px;
   margin-top: 7.5px;
 }
-.sep {
-  margin-right: 20px;
-  margin-left: 20px;
+.control {
+  width: 200px;
+  display: inline-block;
+}
+.group {
+  white-space: nowrap;
+  margin-bottom: 10px;
 }
