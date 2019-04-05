@@ -1,0 +1,22 @@
+body {
+  font-family: sans-serif
+}
+.datepicker {
+  width: 9.5em; 
+}
+.label {
+  display: inline-block;
+  white-space: nowrap;
+  width: 7em;
+  text-align: right;
+  margin-right: 5px;
+  margin-top: 7.5px;
+}
+.control {
+  width: 200px;
+  display: inline-block;
+}
+.group {
+  white-space: nowrap;
+  margin-bottom: 10px;
+}

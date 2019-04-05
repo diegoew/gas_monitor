@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang=en>
+  <head>
+    <meta content='text/html;charset=utf-8' http-equiv='Content-Type'>
+    <meta property='og:site_name' content='Protect Playa Now' />
+    <title>Gas monitor readings - Protect Playa Now</title>
+    <script type=text/javascript src=https://www.gstatic.com/charts/loader.js></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/smoothness/jquery-ui.css">
+    <link rel=stylesheet href=chart.css>
+    <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js></script>
+    <script type=text/javascript src=https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/jquery-ui.min.js></script>
+  </head>
+  <body>
+    <span id=controls>
+      <span class=group>
+        <span class=label>Device</span>
+        <select id=devices onchange=getDataAndDrawChart()></select>
+      </span>
+      <span class=group>
+        <span class=label></span>
+        <select id=dataType onchange=getDataAndDrawChart()>
+          <option value=raw>Raw sensor value</option>
+          <option value=ppm>PPM estimate</option>
+        </select>
+      </span>
+      <br/>
+      <span class=group>
+        <span class=label>Start</span>
+        <input class=datepicker id=start onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
+      </span>
+      <br/>
+      <span class=group>
+        <span class=label>End</span>
+        <input class=datepicker id=end onclick=$('#ago').val(null) onchange=$('#ago').val(null)>
+      </span>
+      <span class=group>
+        <span class=label>Show last</span>
+        <select id=ago onchange='setDatePickers(); getDataAndDrawChart()'>
+          <option disabled></option>
+          <option value=1 selected>1 hour</option>
+          <option value=6>6 hours</option>
+          <option value=24>24 hours</option>
+        </select>
+      </span>
+      <span class=group>
+        <span class=label></span>
+        <button id=update onclick='setDatePickers(); getDataAndDrawChart()'>Update chart</button>
+      </span>
+    </span>
+    <div id=chart_div></div>
+  <script>
+google.charts.load('current', {'packages':['corechart']});
+google.setOnLoadCallback(populateDevices);
+
+var urlBase = 'http://34.223.248.143';
+var chart;
+var chartData;
+var chartOptions = {
+  legend: {position: 'none'},
+  chartArea: {
+    width: '90%',
+    height: '90%'
+  },
+  enableInteractivity: true,
+  hAxis: {
+    gridlines: {
+      count: -1,
+      units: {
+        days: {format: ['MMM dd']},
+        hours: {format: ['HH:mm', 'ha']},
+      }
+    },
+    textStyle: {
+      fontSize: '11'
+    },
+    minorGridlines: {
+      units: {
+        hours: {format: ['hh:mm:ss a', 'ha']},
+        minutes: {format: ['HH:mm a Z', ':mm']}
+      }
+    }
+  },
+  vAxis: {
+    textStyle: {
+      fontSize: '11'
+    }
+  }
+};
+
+function timeStr(d) {
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var s = d.getSeconds();
+  if (h < 10) h = '0' + h;
+  if (m < 10) m = '0' + m;
+  if (s < 10) s = '0' + s;
+  return h + ':' + m + ':' + s;
+}
+
+function formatDateForDisplay(d) {
+  // Example output: 04/03/2018 00:00:00
+  var year = d.getFullYear();
+  var month = 1 + d.getMonth();
+  var day = d.getDate();
+  if (month < 10) month = '0' + month;
+  if (day < 10) day = '0' + day;
+  return month + '/' + day + '/' + year + ' ' + timeStr(d);
+}
+
+function formatDateForServer(d) {
+  // Example output: 2018-04-03T00:00:00-08:00
+  var year = d.getFullYear();
+  var month = 1 + d.getMonth();
+  var day = d.getDate();
+  var z = d.getTimezoneOffset() / 60;
+  var a = Math.round(Math.abs(z));
+  if (month < 10) month = '0' + month;
+  if (day < 10) day = '0' + day;
+  if (a < 10) a = '0' + a;
+  var tz = (z < 0 ? '+' : '-') + a + ':00';
+  return year + '-' + month + '-'  + day + 'T' + timeStr(d) + tz;  
+}
+
+function hoursAgoDate(hours) {
+  var date = new Date();
+  date.setHours(date.getHours() - hours);
+  return date;
+}
+
+function setDatePickers() {
+  var ago = $('#ago').val();
+  if (ago == null) return;
+  var startTime = hoursAgoDate(ago)
+  $('#start').val(formatDateForDisplay(startTime));
+  $('#end').val(formatDateForDisplay(new Date()));
+}
+
+function getDataAndDrawChart() {
+  var start = new Date($('#start').val());
+  var end = new Date($('#end').val());
+  var startParam = '&startDateTime=' + formatDateForServer(start);
+  var endParam = '&endDateTime=' + formatDateForServer(end);
+  var deviceParam = '&deviceId=' + $('#devices option:selected').text();
+  var url = urlBase + '/readings?gasName=methane' + deviceParam + startParam + endParam;
+  console.log(url);
+  $('select,button').prop('disabled', true);
+  $.getJSON(url, function(data) {
+    console.log('Received data size: ' + data.length);
+    chartData = new google.visualization.DataTable();
+    chartData.addColumn('datetime', 'Time of Day');
+    chartData.addColumn('number', '');
+    chart = new google.visualization.LineChart($('#chart_div')[0]);
+    chart.clearChart();
+    var x;
+    for (i in data) {
+      x = data[i];
+      chartData.addRows([
+        [
+          new Date(x.instant),
+          $('#dataType').val() == 'raw' ?  x.input : x.reading
+        ]
+      ]);
+    }
+    chart.draw(chartData, chartOptions);
+    $('select,button').prop('disabled', false);
+  });
+};
+
+function populateDevices() {
+  var $dropdown = $('#devices');
+  var url = urlBase + '/devices?ids=true';
+  $.getJSON(url, function(devIds) {
+    var isSel = false;
+    var id;
+    for (i in devIds) {
+      id = devIds[i]
+      if (!isSel && id.startsWith('RaspPi-GasMonitor')) {
+        $dropdown.append($('<option selected />').val(id).text(id));
+        isSel = true;
+      } else if (!id.startsWith('zTest')) {
+        $dropdown.append($('<option />').val(id).text(id));
+      }
+    }
+    getDataAndDrawChart();
+  });
+}
+
+function resizeChart() {
+  var height = Math.max(300, window.innerHeight - $('#controls').height() - 60);
+  console.log($('#controls').height());
+  $('#chart_div')[0].setAttribute('style', 'height:' + height + 'px');
+}
+
+resizeChart();
+setDatePickers();
+
+$('#end').datepicker({
+  onSelect: function(dateText) {
+    $('#end').val(dateText + ' ' + timeStr(new Date()));
+  }
+});
+
+$('#start').datepicker({
+  onSelect: function(dateText) {
+    $('#start').val(dateText + ' ' + timeStr(new Date()));
+  }
+});
+
+$(window).resize(function() {
+  if (this.resizeTO) clearTimeout(this.resizeTO);
+  this.resizeTO = setTimeout(function() {
+    $(this).trigger('resizeEnd');
+  }, 500);
+});
+
+$(window).on('resizeEnd', function() {
+  resizeChart();
+  chart.draw(chartData, chartOptions);
+});
+    </script>
+  </body>
+</html>
