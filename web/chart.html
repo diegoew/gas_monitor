@@ -186,7 +186,7 @@ function populateDevices() {
 }
 
 function resizeChart() {
-  var height = Math.max(200, window.innerHeight - $('#controls').height() - 60);
+  var height = Math.max(300, window.innerHeight - $('#controls').height() - 60);
   console.log($('#controls').height());
   $('#chart_div')[0].setAttribute('style', 'height:' + height + 'px');
 }
