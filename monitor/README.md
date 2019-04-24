@@ -1,6 +1,6 @@
 ### Requirements:
 - MQ series sensors
-- ADS1115 analog-to-digital converter (ADC) - https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/ads1015-slash-ads1115
+- [ADS1115](https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/ads1015-slash-ads1115) analog-to-digital converter (ADC)
 - Raspberry Pi
 - Python program running on Raspberry Pi
 
