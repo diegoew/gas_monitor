@@ -24,7 +24,7 @@ Run a local mysql instance using the schema file in /api/database/schema_create.
 
 Modify add local mysql path, username, password in file: /api/src/main/resources/application.properties
 
-## Leverage Gradle to run the application locally (SECTION BELOW IS A PLACEHOLDER, bootRun command needs to be added)
+## Leverage Gradle to run the application locally 
 
 The server uses the [Gradle][gradle] build system.
 
