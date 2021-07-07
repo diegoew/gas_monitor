@@ -25,7 +25,7 @@
 1. Execute<br>`git clone https://github.com/diegoew/gas_monitor.git && cd gas_monitor/monitor && sudo pip3 install -r requirements.txt`
 1. Edit file `config.py` items `DEVICE_ID`, `LAT`, `LON`, `ADC_TYPE`, 
 `SENSOR_TYPES` and `OPENWEATHER_KEY`
-1. Execute<br>`sudo systemctl daemon-reload && sudo systemctl enable --now $PWD/gas-monitor.service`
+1. Execute<br>`sudo systemctl daemon-reload && sudo systemctl enable --now $PWD/gas-monitor.service $PWD/uploader.service`
 1. Check the [server graph](http://www.protectplayanow.org/gas-monitor-testpage.html)
 
 ### Control and logs
